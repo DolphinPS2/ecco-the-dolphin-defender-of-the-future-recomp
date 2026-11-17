@@ -11,7 +11,7 @@ def extract_cdi(disc_path, out_dir):
     with open(disc_path, "rb") as f:
         blob = f.read()
     pvd_pos = blob.rfind(b"\x01CD001\x01")
-    data_pvd = blob.find(b"\x01CD001\x01")
+    data_pvd = blob.find(b"\x01CD001\x01", 1000000)
     if pvd_pos < 0:
         raise RuntimeError("ISO9660 PVD not found in CDI")
     if pvd_pos >= 24 and blob[pvd_pos - 24:pvd_pos - 12] == b"\x00" + b"\xff" * 10 + b"\x00":
