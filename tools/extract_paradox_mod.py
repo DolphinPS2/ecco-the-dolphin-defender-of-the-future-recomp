@@ -10,12 +10,22 @@ def match_name(rel_path):
 def extract_cdi(disc_path, out_dir):
     with open(disc_path, "rb") as f:
         blob = f.read()
-    pvd_pos = blob.find(b"\x01CD001\x01")
+    pvd_pos = blob.rfind(b"\x01CD001\x01")
     if pvd_pos < 0:
         raise RuntimeError("ISO9660 PVD not found in CDI")
     sec_size = 2352 if (pvd_pos >= 24 and blob[pvd_pos - 24:pvd_pos - 12] == b"\x00" + b"\xff" * 10 + b"\x00") else 2048
     data_off = 24 if sec_size == 2352 else 0
+    pvd = blob[pvd_pos:pvd_pos + 2048]
+    root_lba, = struct.unpack_from("<I", pvd, 158)
+    root_len, = struct.unpack_from("<I", pvd, 166)
     base_off = pvd_pos - 16 * sec_size
+    for cand_lba in (0, 11700, 11702, 45000):
+        test_off = pvd_pos + (root_lba - 16 - cand_lba) * sec_size
+        if 0 <= test_off < len(blob) - 34:
+            r_lba, = struct.unpack_from("<I", blob, test_off + 2)
+            if r_lba == root_lba and blob[test_off + 33:test_off + 34] == b"\x00":
+                base_off = pvd_pos - (16 + cand_lba) * sec_size
+                break
     def read_extent(lba, size):
         out = bytearray()
         rem = size
@@ -27,9 +37,6 @@ def extract_cdi(disc_path, out_dir):
             rem -= chunk
             cur += 1
         return bytes(out)
-    pvd = read_extent(16, 2048)
-    root_lba, = struct.unpack_from("<I", pvd, 158)
-    root_len, = struct.unpack_from("<I", pvd, 166)
     count = 0
     def walk_dir(lba, length, prefix=""):
         nonlocal count
@@ -82,7 +89,7 @@ def extract_from_disc(disc_path, out_dir):
     cfg = os.path.join(os.path.dirname(os.path.dirname(out_dir)), "settings.ini")
     if not os.path.exists(cfg):
         with open(cfg, "w", encoding="utf-8") as sf:
-            sf.write("[mods]\nenabled = rus_paradox\n")
+            sf.write("mods = rus_paradox\n")
     print(f"Extracted {count} Paradox RUS mod files into {out_dir}")
 
 if __name__ == "__main__":
