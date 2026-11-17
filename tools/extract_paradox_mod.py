@@ -22,22 +22,19 @@ def extract_cdi(disc_path, out_dir):
     pvd = blob[pvd_pos:pvd_pos + 2048]
     root_lba, = struct.unpack_from("<I", pvd, 158)
     root_len, = struct.unpack_from("<I", pvd, 166)
-    base_off = pvd_pos - 16 * sec_size
+    sess_lba = 0
     marker = blob.rfind(b"000_TITLE.GDE;1")
     if marker > 33:
         rec_start = marker - 33
         r_lba, = struct.unpack_from("<I", blob, rec_start + 2)
-        if r_lba > 16:
-            diff_sec = round((rec_start - pvd_pos) / sec_size)
-            cand_lba = r_lba - 16 - diff_sec
-            if cand_lba >= 0:
-                base_off = pvd_pos - (16 + cand_lba) * sec_size
+        diff_sec = round((rec_start - pvd_pos) / sec_size)
+        sess_lba = max(0, r_lba - 16 - diff_sec)
     def read_extent(lba, size):
         out = bytearray()
         rem = size
         cur = lba
         while rem > 0:
-            pos = base_off + cur * sec_size
+            pos = pvd_pos + (cur - sess_lba - 16) * sec_size
             chunk = min(2048, rem)
             out.extend(blob[pos:pos + chunk])
             rem -= chunk
