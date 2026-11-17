@@ -25,11 +25,11 @@ def extract_cdi(disc_path, out_dir):
             if is_dir:
                 pos = pvd_pos + (cur - 16) * sec_size
             elif cur >= 400000:
-                pos = -278651896 + cur * sec_size
+                pos =  + cur * sec_size
             elif cur >= 100000:
-                pos = 4800680 + cur * sec_size
+                pos =  + cur * sec_size
             else:
-                pos = 4800680 + cur * sec_size
+                pos =  + cur * sec_size
             chunk = min(2048, rem)
             out.extend(blob[pos:pos + chunk])
             rem -= chunk
