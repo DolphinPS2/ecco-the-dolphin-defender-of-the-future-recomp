@@ -29,7 +29,7 @@ def extract_cdi(disc_path, out_dir):
         rem = size
         cur = lba
         while rem > 0:
-            pos = (pvd_pos if is_dir else data_pvd) + (cur - 16) * sec_size
+            pos = (pvd_pos if is_dir else data_pvd) + (cur - 16) * sec_size + (8 if (not is_dir and sec_size == 2336) else 0)
             chunk = min(2048, rem)
             out.extend(blob[pos:pos + chunk])
             rem -= chunk
