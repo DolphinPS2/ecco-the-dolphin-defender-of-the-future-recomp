@@ -23,12 +23,6 @@ def extract_cdi(disc_path, out_dir):
     root_lba, = struct.unpack_from("<I", pvd, 158)
     root_len, = struct.unpack_from("<I", pvd, 166)
     sess_lba = 0
-    marker = blob.rfind(b"000_TITLE.GDE;1")
-    if marker > 33:
-        rec_start = marker - 33
-        r_lba, = struct.unpack_from("<I", blob, rec_start + 2)
-        diff_sec = round((rec_start - pvd_pos) / sec_size)
-        sess_lba = max(0, r_lba - 16 - diff_sec)
     def read_extent(lba, size):
         out = bytearray()
         rem = size
@@ -45,7 +39,7 @@ def extract_cdi(disc_path, out_dir):
         nonlocal count
         buf = read_extent(lba, length)
         off = 0
-        while off < len(buf):
+        while off + 33 <= len(buf):
             rec_len = buf[off]
             if rec_len == 0:
                 off = ((off // 2048) + 1) * 2048
