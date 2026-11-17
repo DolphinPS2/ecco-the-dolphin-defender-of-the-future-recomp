@@ -36,6 +36,14 @@ recompiled code against the engine's SH-4 interpreter.
 - Saves to a per-user virtual memory card; rumble; keyboard and gamepad, rebindable in game
 - Texture dumping and replacement packs, file mods (dreamcomp `docs/TEXTURE-PACKS.md`, `docs/MODS.md`)
 
+## One-Click Automated Build (Windows & Linux)
+
+You can build the complete portable package (including dual-profile Europe + Paradox RUS support) automatically from your own disc images:
+
+1. Place your **Europe** disc image (`Ecco the Dolphin - Defender of the Future (Europe).chd` / `.cue` / `.gdi`) and optionally your **Paradox Russian** disc image (`.cdi` / `.chd` / `.gdi`) anywhere on disk.
+2. *(Optional)* If you have the custom animated launcher assets, place the `media/` folder into the root of this repository before building.
+3. Run **`windows\build_windows.bat`** (on Windows) or **`linux/build_linux.sh`** (on Linux) and enter the paths to your disc images when prompted. The script automatically verifies the Europe boot binary, compiles the engine, extracts only the localized mod files (`*.GDE`, `0GDTEX.PVR`, `MUSIC_*.AFS`, `SOUND/*.KAT`) from the Paradox disc into `profiles/paradox_rus/dreamcomp/ecco/mods/rus_paradox/`, and assembles the ready-to-play folder.
+
 ## Building (Windows)
 
 Tested and verified on Windows 10/11 x64. See **[docs/WINDOWS-BUILD.md](docs/WINDOWS-BUILD.md)** for full prerequisites, step-by-step PowerShell commands, standalone launcher/installer sources (`windows/`), and solutions to known Windows build traps:
@@ -109,7 +117,7 @@ Environment switches for A/B comparisons: `DREAM_STRIP_SORT=1` (old per-strip tr
 address, the Katana stub relocations, the projection builder, the HUD layers and the menu cursor.
 `docs/PLAN.md` has the phases, decisions and verified checkpoints, and `docs/findings/phase-00.md`
 the disc survey. The engine changes are listed in dreamcomp's `docs/engine-changes.md`, and the
-traps found along the way are entries T26вЂ“T31 in its playbook.
+traps found along the way are entries T26РІР‚вЂњT31 in its playbook.
 
 ## Credits
 
