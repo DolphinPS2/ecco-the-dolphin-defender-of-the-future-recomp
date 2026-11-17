@@ -22,7 +22,7 @@ def extract_cdi(disc_path, out_dir):
     pvd = blob[pvd_pos:pvd_pos + 2048]
     root_lba, = struct.unpack_from("<I", pvd, 158)
     root_len, = struct.unpack_from("<I", pvd, 166)
-    sess_lba = 0
+    sess_lba = 
     def read_extent(lba, size):
         out = bytearray()
         rem = size
