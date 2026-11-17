@@ -11,27 +11,27 @@ def extract_cdi(disc_path, out_dir):
     with open(disc_path, "rb") as f:
         blob = f.read()
     pvd_pos = blob.rfind(b"\x01CD001\x01")
-    tscr_pos = blob.find(b"TSCR\x10\x00\x10\x00PVRT")
-    data_base = (tscr_pos - 1668 * 2336) if tscr_pos > 0 else (blob.find(b"\x01CD001\x01", 1000000) - 16 * 2336)
     if pvd_pos < 0:
         raise RuntimeError("ISO9660 PVD not found in CDI")
-    if pvd_pos >= 24 and blob[pvd_pos - 24:pvd_pos - 12] == b"\x00" + b"\xff" * 10 + b"\x00":
-        sec_size = 2352
-    elif pvd_pos >= 8 and blob[pvd_pos - 8:pvd_pos] == b"\x00\x00\x08\x00\x00\x00\x08\x00":
-        sec_size = 2336
-    else:
-        sec_size = 2336
+    sec_size = 2352 if (pvd_pos >= 24 and blob[pvd_pos - 24:pvd_pos - 12] == b"\x00" + b"\xff" * 10 + b"\x00") else 2336
+    tscr_pos = blob.find(b"TSCR\x10\x00\x10\x00PVRT")
+    data_base = (tscr_pos - 1668 * sec_size) if tscr_pos > 0 else (blob.find(b"\x01CD001\x01", 1000000) - 16 * sec_size)
+    kat_marker = blob.find(b"SND\x00")
+    kat_base = (kat_marker - 451496 * sec_size) if kat_marker > 0 else -278652656
     pvd = blob[pvd_pos:pvd_pos + 2048]
     root_lba, = struct.unpack_from("<I", pvd, 158)
     root_len, = struct.unpack_from("<I", pvd, 166)
-    sess_lba = 0
     def read_extent(lba, size, is_dir=False):
         out = bytearray()
         rem = size
         cur = lba
         while rem > 0:
-            pos = (pvd_pos + (cur - 16) * sec_size) if is_dir else ((-278651896 + cur * sec_size) if cur >= 200000 else (data_base + cur * sec_size))
-            if pos < 0 or pos >= len(blob): pos = pvd_pos + (cur - 11718) * sec_size
+            if is_dir:
+                pos = pvd_pos + (cur - 16) * sec_size
+            elif cur >= 200000:
+                pos = kat_base + cur * sec_size
+            else:
+                pos = data_base + cur * sec_size
             chunk = min(2048, rem)
             out.extend(blob[pos:pos + chunk])
             rem -= chunk
