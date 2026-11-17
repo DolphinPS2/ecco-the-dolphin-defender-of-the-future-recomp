@@ -19,13 +19,14 @@ def extract_cdi(disc_path, out_dir):
     root_lba, = struct.unpack_from("<I", pvd, 158)
     root_len, = struct.unpack_from("<I", pvd, 166)
     base_off = pvd_pos - 16 * sec_size
-    for cand_lba in (0, 11700, 11702, 45000):
-        test_off = pvd_pos + (root_lba - 16 - cand_lba) * sec_size
-        if 0 <= test_off < len(blob) - 34:
-            r_lba, = struct.unpack_from("<I", blob, test_off + 2)
-            if r_lba == root_lba and blob[test_off + 33:test_off + 34] == b"\x00":
-                base_off = pvd_pos - (16 + cand_lba) * sec_size
-                break
+    marker = blob.rfind(b"000_TITLE.GDE;1")
+    if marker > 33:
+        rec_start = marker - 33
+        r_lba, = struct.unpack_from("<I", blob, rec_start + 2)
+        if r_lba > 16:
+            diff_sec = (rec_start - pvd_pos) // sec_size
+            cand_lba = r_lba - 16 - diff_sec
+            base_off = pvd_pos - (16 + cand_lba) * sec_size
     def read_extent(lba, size):
         out = bytearray()
         rem = size
