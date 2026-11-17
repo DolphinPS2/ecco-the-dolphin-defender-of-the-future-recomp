@@ -15,7 +15,7 @@ WORK_DIR="$(dirname "$PORT_SRC")"
 DC_DIR="$WORK_DIR/dreamcomp"
 
 if [[ ! -d "$DC_DIR" ]]; then
-    git clone -b linux-ecco --recurse-submodules https://github.com "$DC_DIR"
+    git clone -b linux-ecco --recurse-submodules https://github.com/cherryduck/dreamcomp.git "$DC_DIR"
 fi
 
 cd "$DC_DIR"

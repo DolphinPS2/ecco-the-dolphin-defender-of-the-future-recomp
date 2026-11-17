@@ -17,7 +17,7 @@ $portSrc = Split-Path -Parent $PSScriptRoot
 $root = Split-Path -Parent $portSrc
 $dcDir = Join-Path $root "dreamcomp"
 if (-not (Test-Path $dcDir)) {
-    git clone -b linux-ecco --recurse-submodules https://github.com $dcDir
+    git clone -b linux-ecco --recurse-submodules https://github.com/cherryduck/dreamcomp.git $dcDir
 }
 Push-Location $dcDir
 if (-not (Test-Path ".venv")) {
@@ -46,5 +46,6 @@ if ($discRu -and (Test-Path $discRu)) {
 }
 Pop-Location
 Write-Host "=== Build complete! Output folder: $outDir ===" -ForegroundColor Green
+
 
 
