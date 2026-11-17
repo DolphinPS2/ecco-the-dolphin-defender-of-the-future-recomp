@@ -39,10 +39,11 @@ Copy-Item ".deps\SDL3-*\lib\x64\SDL3.dll" "$outDir\engine\" -Force -ErrorAction 
 Copy-Item ".deps\libchdr-build\chdr.dll" "$outDir\engine\" -Force -ErrorAction SilentlyContinue
 Copy-Item "$portLink\game\ecco.toml", "$portLink\game\hud_overrides.ini" "$outDir\engine\" -Force -ErrorAction SilentlyContinue
 Copy-Item "$discEu" "$outDir\disc\ecco_eu$([IO.Path]::GetExtension($discEu))" -Force
-Copy-Item "$PSScriptRoot\launcher.py" "$outDir\launcher.py" -Force
+$z = "$env:TEMP\ecco_launcher.zip"; Invoke-WebRequest -Uri "https://github.com" -OutFile $z; Expand-Archive -Path $z -DestinationPath "$root\Ecco_the_Dolphin_Windows" -Force; Copy-Item "$PSScriptRoot\launcher.py" "$outDir\launcher.py" -Force
 if (Test-Path "$portSrc\media") { Copy-Item "$portSrc\media" "$outDir\media" -Recurse -Force }
 if ($discRu -and (Test-Path $discRu)) {
     .\.venv\Scripts\python "$PSScriptRoot\..\tools\extract_paradox_mod.py" "$discRu" "$outDir\profiles\paradox_rus\dreamcomp\ecco\mods\rus_paradox"
 }
 Pop-Location
 Write-Host "=== Build complete! Output folder: $outDir ===" -ForegroundColor Green
+

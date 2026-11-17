@@ -1,4 +1,4 @@
-﻿# Ecco the Dolphin: Defender of the Future: Recompiled (Dreamcast)
+# Ecco the Dolphin: Defender of the Future: Recompiled (Dreamcast)
 
 A native PC port of **Ecco the Dolphin: Defender of the Future** (Dreamcast, Europe, Appaloosa
 Interactive / Sega 2000), built with [dreamcomp](https://github.com/cherryduck/dreamcomp/tree/linux-ecco).
@@ -39,7 +39,7 @@ recompiled code against the engine's SH-4 interpreter.
 ## One-Click Automated Build (Windows & Linux)
 
 1. Place your **Europe** disc image (.chd / .cue / .gdi) and optionally your **Paradox Russian** disc image (.cdi / .chd / .gdi) on disk.
-2. Run **windows\build_windows.bat** or **linux/build_linux.sh** to build the game and extract Russian mod files automatically.
+2. Run **windows\build_windows.bat** or **linux/build_linux.sh** to build the game, download the [DC PC Graphical Launcher](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/tag/v1.0-dc-pc-launcher), and extract Russian mod files automatically.
 
 ## Building (Windows)
 
