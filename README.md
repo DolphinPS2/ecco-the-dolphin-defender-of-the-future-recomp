@@ -1,4 +1,4 @@
-# Ecco the Dolphin: Defender of the Future: Recompiled (Dreamcast)
+﻿# Ecco the Dolphin: Defender of the Future: Recompiled (Dreamcast)
 
 A native PC port of **Ecco the Dolphin: Defender of the Future** (Dreamcast, Europe, Appaloosa
 Interactive / Sega 2000), built with [dreamcomp](https://github.com/cherryduck/dreamcomp/tree/linux-ecco).
@@ -8,7 +8,7 @@ original binary.
 
 **You need your own copy of the game.** This repository contains no game code or data. The port
 reads your disc image at run time and refuses any release other than the one it was built from:
-Europe, MK-5103350 V1.003, boot file `0.BIN`, SHA-1 `e6b20996…e921d264c0`.
+Europe, MK-5103350 V1.003, boot file `0.BIN`, SHA-1 `e6b20996вЂ¦e921d264c0`.
 
 ## Status
 
@@ -18,7 +18,7 @@ recompiled code against the engine's SH-4 interpreter.
 
 | | |
 |---|---|
-| Platform | Linux x64 (CachyOS, g++ 16, Vulkan, Wayland). Windows and macOS untested for this port |
+| Platform | Linux x64 (CachyOS, g++ 16, Vulkan, Wayland) and **Windows x64** (Windows 10/11, clang-cl / MSVC, Vulkan / DXGI). macOS untested |
 | Disc | Europe only (MK-5103350). The USA and Japanese releases are different binaries |
 | Recompiled code | 17,574 functions, 0 untranslated calls over menus and gameplay |
 
@@ -35,6 +35,14 @@ recompiled code against the engine's SH-4 interpreter.
   longer shows through the sea surface from below
 - Saves to a per-user virtual memory card; rumble; keyboard and gamepad, rebindable in game
 - Texture dumping and replacement packs, file mods (dreamcomp `docs/TEXTURE-PACKS.md`, `docs/MODS.md`)
+
+## Building (Windows)
+
+Tested and verified on Windows 10/11 x64. See **[docs/WINDOWS-BUILD.md](docs/WINDOWS-BUILD.md)** for full prerequisites, step-by-step PowerShell commands, standalone launcher/installer sources (`windows/`), and solutions to known Windows build traps:
+
+- **CMake font download hang:** `DreamcompFrontend.cmake` can stall indefinitely while downloading `Inter` / `PromptFont` fonts during CMake configuration (pre-cache the fonts or pass `-DDREAMCOMP_FRONTEND=OFF` when using `windows/launcher.py`).
+- **Required `linux-ecco` branch:** Always build against `cherryduck/dreamcomp` branch `linux-ecco` (`DREAM_GEN_SHARDS`); building without code sharding emits all 17,574 functions into one file and hangs the compiler.
+- **Environment:** Initialize `vcvars64.bat` (needed for `ml64.exe` when building `chdr.dll`) and set `$env:PYTHONUTF8 = "1"` on non-UTF-8 Windows locales.
 
 ## Building (Linux)
 
@@ -101,11 +109,11 @@ Environment switches for A/B comparisons: `DREAM_STRIP_SORT=1` (old per-strip tr
 address, the Katana stub relocations, the projection builder, the HUD layers and the menu cursor.
 `docs/PLAN.md` has the phases, decisions and verified checkpoints, and `docs/findings/phase-00.md`
 the disc survey. The engine changes are listed in dreamcomp's `docs/engine-changes.md`, and the
-traps found along the way are entries T26–T31 in its playbook.
+traps found along the way are entries T26вЂ“T31 in its playbook.
 
 ## Credits
 
-- Ecco the Dolphin: Defender of the Future © 2000 Sega, developed by Appaloosa Interactive. This
+- Ecco the Dolphin: Defender of the Future В© 2000 Sega, developed by Appaloosa Interactive. This
   project is not affiliated with Sega or Appaloosa.
 - [dreamcomp](https://github.com/danielgomesvieira2000/dreamcomp) (danielgomesvieira2000), built
   on [dream-recomp](https://github.com/phobos665/dream-recomp) (phobos665), which draws on
@@ -120,3 +128,4 @@ Developed with AI assistance (Claude), following dreamcomp's workflow; see dream
 ## Licence
 
 GPL-2.0.
+
