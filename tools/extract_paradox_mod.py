@@ -6,7 +6,7 @@ def extract_from_disc(disc_path, out_dir):
     os.makedirs(out_dir, exist_ok=True); count = 0
     with open_image(disc_path) as img:
         for rel_path, data in img.walk_files():
-            norm = rel_path.replace("\\", "/").lstrip("/")
+            norm = rel_path.replace("\\", "/").lstrip("/").split(";")[0]
             if any(fnmatch.fnmatch(norm.upper(), pat) for pat in PATTERNS):
                 dst = os.path.join(out_dir, *norm.split("/")); os.makedirs(os.path.dirname(dst), exist_ok=True)
                 open(dst, "wb").write(data); count += 1
