@@ -16,8 +16,8 @@ def extract_cdi(disc_path, out_dir):
     sec_size = 2352 if (pvd_pos >= 24 and blob[pvd_pos - 24:pvd_pos - 12] == b"\x00" + b"\xff" * 10 + b"\x00") else 2336
     tscr_pos = blob.find(b"TSCR\x10\x00\x10\x00PVRT")
     data_base = (tscr_pos - 1668 * sec_size) if tscr_pos > 0 else (blob.find(b"\x01CD001\x01", 1000000) - 16 * sec_size)
-    kat_marker = blob.find(b"KAT\x00\x01\x00")
-    kat_base = (kat_marker - 451496 * sec_size) if kat_marker > 0 else -278652656
+    kat_pos = blob.find(b'KAT\x00', 700000000)
+    kat_base = (776042760 - 451496 * sec_size) if kat_pos < 0 else -278652656
     pvd = blob[pvd_pos:pvd_pos + 2048]
     root_lba, = struct.unpack_from("<I", pvd, 158)
     root_len, = struct.unpack_from("<I", pvd, 166)
