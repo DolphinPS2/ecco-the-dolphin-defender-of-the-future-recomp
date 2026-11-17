@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 $env:PYTHONUTF8 = "1"
 Write-Host "=== Ecco the Dolphin: Automated Windows x64 Build ===" -ForegroundColor Cyan
 $disc = Read-Host "Enter full path to your Ecco Europe disc image (.chd / .cue / .gdi)"

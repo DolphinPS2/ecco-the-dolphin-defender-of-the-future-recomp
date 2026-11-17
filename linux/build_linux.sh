@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 echo "=== Ecco the Dolphin: Automated Linux x64 Build ==="

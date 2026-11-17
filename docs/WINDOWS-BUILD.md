@@ -1,4 +1,4 @@
-﻿# Building & Packaging on Windows x64
+# Building & Packaging on Windows x64
 
 Tested and verified on **Windows 10 / 11 x64** using **Visual Studio 2022 Build Tools** (`vcvars64.bat`), **LLVM `clang-cl`**, **Ninja**, **CMake**, **Vulkan SDK**, and **Python 3.12**.
 
@@ -33,7 +33,7 @@ cd dreamcomp
 python -m venv .venv
 .\.venv\Scripts\pip install -e "engine/tools/dcdisc[test]" pillow
 
-git clone https://github.com ports\ecco-the-dolphin-defender-of-the-future-recomp
+git clone https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp.git ports\ecco-the-dolphin-defender-of-the-future-recomp
 \$P = "ports/ecco-the-dolphin-defender-of-the-future-recomp"
 
 # 3. Setup disc (extracts 0.BIN boot executable only; supports .cue/.bin, .gdi, .chd)
