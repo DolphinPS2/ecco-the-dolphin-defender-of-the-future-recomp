@@ -13,8 +13,12 @@ def extract_cdi(disc_path, out_dir):
     pvd_pos = blob.rfind(b"\x01CD001\x01")
     if pvd_pos < 0:
         raise RuntimeError("ISO9660 PVD not found in CDI")
-    sec_size = 2352 if (pvd_pos >= 24 and blob[pvd_pos - 24:pvd_pos - 12] == b"\x00" + b"\xff" * 10 + b"\x00") else 2048
-    data_off = 24 if sec_size == 2352 else 0
+    if pvd_pos >= 24 and blob[pvd_pos - 24:pvd_pos - 12] == b"\x00" + b"\xff" * 10 + b"\x00":
+        sec_size = 2352
+    elif pvd_pos >= 8 and blob[pvd_pos - 8:pvd_pos] == b"\x00\x00\x08\x00\x00\x00\x08\x00":
+        sec_size = 2336
+    else:
+        sec_size = 2048
     pvd = blob[pvd_pos:pvd_pos + 2048]
     root_lba, = struct.unpack_from("<I", pvd, 158)
     root_len, = struct.unpack_from("<I", pvd, 166)
@@ -24,15 +28,16 @@ def extract_cdi(disc_path, out_dir):
         rec_start = marker - 33
         r_lba, = struct.unpack_from("<I", blob, rec_start + 2)
         if r_lba > 16:
-            diff_sec = (rec_start - pvd_pos) // sec_size
+            diff_sec = round((rec_start - pvd_pos) / sec_size)
             cand_lba = r_lba - 16 - diff_sec
-            base_off = pvd_pos - (16 + cand_lba) * sec_size
+            if cand_lba > 0:
+                base_off = pvd_pos - (16 + cand_lba) * sec_size
     def read_extent(lba, size):
         out = bytearray()
         rem = size
         cur = lba
         while rem > 0:
-            pos = base_off + cur * sec_size + data_off
+            pos = base_off + cur * sec_size
             chunk = min(2048, rem)
             out.extend(blob[pos:pos + chunk])
             rem -= chunk
