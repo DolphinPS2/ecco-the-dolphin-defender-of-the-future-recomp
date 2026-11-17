@@ -1,4 +1,4 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 $env:PYTHONUTF8 = "1"
 Write-Host "=== Ecco the Dolphin: Automated Windows x64 Build ===" -ForegroundColor Cyan
 $discEu = Read-Host "1. Enter path to Europe disc image (.chd / .cue / .gdi) [REQUIRED]"
@@ -30,6 +30,7 @@ Copy-Item $portSrc $portLink -Recurse -Force
 
 .\.venv\Scripts\python tools/dc.py setup $portLink --disc "$discEu"
 .\.venv\Scripts\python tools/dc.py build $portLink
+if ($discRu -and (Test-Path $discRu)) { .\.venv\Scripts\python "$portLink\tools\extract_paradox_mod.py" "$discRu" "$root\Ecco_the_Dolphin_Windows\profiles\paradox_rus\dreamcomp\ecco\mods\rus_paradox" }
 
 $outDir = Join-Path $root "Ecco_the_Dolphin_Windows"
 New-Item -ItemType Directory -Force -Path "$outDir\engine", "$outDir\disc", "$outDir\profiles\europe\dreamcomp\ecco", "$outDir\profiles\paradox_rus\dreamcomp\ecco" | Out-Null

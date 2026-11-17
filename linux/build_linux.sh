@@ -2,7 +2,8 @@
 set -euo pipefail
 
 echo "=== Ecco the Dolphin: Automated Linux x64 Build ==="
-read -rp "Enter full path to your Ecco Europe disc image (.chd / .cue / .gdi): " DISC_PATH
+read -rp "1. Enter path to Europe disc image (.chd / .cue / .gdi): " DISC_PATH
+read -rp "2. Enter path to Paradox RUS disc image (.cdi / .chd / .gdi) [Optional]: " DISC_RU
 if [[ ! -f "$DISC_PATH" ]]; then
     echo "Error: Disc image not found at $DISC_PATH" >&2
     exit 1
@@ -31,5 +32,6 @@ cp -a "$PORT_SRC" "$PORT_DST"
 .venv/bin/python tools/dc.py setup "$PORT_DST" --disc "$DISC_PATH"
 # Pass -DDREAMCOMP_FRONTEND=OFF if CMake hangs while downloading Inter/PromptFont fonts
 CMAKE_ARGS="${CMAKE_ARGS:-}" .venv/bin/python tools/dc.py build "$PORT_DST"
+[[ -n "${DISC_RU:-}" && -f "$DISC_RU" ]] && .venv/bin/python "$PORT_DST/tools/extract_paradox_mod.py" "$DISC_RU" "$WORK_DIR/Ecco_the_Dolphin_PC/profiles/paradox_rus/dreamcomp/ecco/mods/rus_paradox"
 
 echo "=== Build complete! Run with: $DC_DIR/.venv/bin/python $DC_DIR/tools/dc.py run $PORT_DST --window ==="
