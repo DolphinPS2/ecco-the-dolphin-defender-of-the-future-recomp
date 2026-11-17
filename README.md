@@ -1,4 +1,4 @@
-﻿# Ecco the Dolphin: Defender of the Future: Recompiled (Dreamcast)
+# Ecco the Dolphin: Defender of the Future: Recompiled (Dreamcast)
 
 A native PC port of **Ecco the Dolphin: Defender of the Future** (Dreamcast, Europe, Appaloosa
 Interactive / Sega 2000), built with [dreamcomp](https://github.com/cherryduck/dreamcomp/tree/linux-ecco).
@@ -8,7 +8,7 @@ original binary.
 
 **You need your own copy of the game.** This repository contains no game code or data. The port
 reads your disc image at run time and refuses any release other than the one it was built from:
-Europe, MK-5103350 V1.003, boot file `0.BIN`, SHA-1 `e6b20996вЂ¦e921d264c0`.
+Europe, MK-5103350 V1.003, boot file `0.BIN`, SHA-1 `e6b20996...e921d264c0`.
 
 ## Status
 
@@ -113,7 +113,7 @@ traps found along the way are entries T26вЂ“T31 in its playbook.
 
 ## Credits
 
-- Ecco the Dolphin: Defender of the Future В© 2000 Sega, developed by Appaloosa Interactive. This
+- Ecco the Dolphin: Defender of the Future (c) 2000 Sega, developed by Appaloosa Interactive. This
   project is not affiliated with Sega or Appaloosa.
 - [dreamcomp](https://github.com/danielgomesvieira2000/dreamcomp) (danielgomesvieira2000), built
   on [dream-recomp](https://github.com/phobos665/dream-recomp) (phobos665), which draws on
