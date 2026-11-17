@@ -18,7 +18,7 @@ def extract_cdi(disc_path, out_dir):
     elif pvd_pos >= 8 and blob[pvd_pos - 8:pvd_pos] == b"\x00\x00\x08\x00\x00\x00\x08\x00":
         sec_size = 2336
     else:
-        sec_size = 2048
+        sec_size = 2336
     pvd = blob[pvd_pos:pvd_pos + 2048]
     root_lba, = struct.unpack_from("<I", pvd, 158)
     root_len, = struct.unpack_from("<I", pvd, 166)
