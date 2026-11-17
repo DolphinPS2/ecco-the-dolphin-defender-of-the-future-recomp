@@ -2,7 +2,7 @@
 $env:PYTHONUTF8 = "1"
 Write-Host "=== Ecco the Dolphin: Automated Windows x64 Build ===" -ForegroundColor Cyan
 $discEu = Read-Host "1. Enter path to Europe disc image (.chd / .cue / .gdi) [REQUIRED]"
-if (-not (Test-Path $discEu)) { throw "Europe disc image not found: $discEu" }
+$discEu = $discEu.Trim().Trim('"') -replace '^\d+\.\s*', ''; if ($discRu) { $discRu = $discRu.Trim().Trim('"') -replace '^\d+\.\s*', '' }; if (-not (Test-Path $discEu)) { throw "Europe disc image not found: $discEu" }
 $discRu = Read-Host "2. Enter path to Paradox RUS disc image (.cdi / .chd / .gdi) [Optional, press Enter to skip]"
 
 $vs = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -property installationPath
@@ -28,7 +28,7 @@ $portLink = "ports\ecco-the-dolphin-defender-of-the-future-recomp"
 New-Item -ItemType Directory -Force -Path "ports" | Out-Null
 Copy-Item $portSrc $portLink -Recurse -Force
 
-.\.venv\Scripts\python tools/dc.py setup $portLink --disc "$discEu"
+.\.venv\Scripts\python tools/dc.py deps; .\.venv\Scripts\python tools/dc.py setup $portLink --disc "$discEu"; Remove-Item "$portLink\build" -Recurse -Force -ErrorAction SilentlyContinue; cmake -S $portLink -B "$portLink\build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DDREAMCOMP_DIR="$dcDir" -DDREAMCOMP_FRONTEND=OFF
 .\.venv\Scripts\python tools/dc.py build $portLink
 if ($discRu -and (Test-Path $discRu)) { .\.venv\Scripts\python "$portLink\tools\extract_paradox_mod.py" "$discRu" "$root\Ecco_the_Dolphin_Windows\profiles\paradox_rus\dreamcomp\ecco\mods\rus_paradox" }
 
@@ -46,6 +46,7 @@ if ($discRu -and (Test-Path $discRu)) {
 }
 Pop-Location
 Write-Host "=== Build complete! Output folder: $outDir ===" -ForegroundColor Green
+
 
 
 

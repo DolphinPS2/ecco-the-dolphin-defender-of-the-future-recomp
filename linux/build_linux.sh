@@ -29,7 +29,7 @@ PORT_DST="ports/ecco-the-dolphin-defender-of-the-future-recomp"
 rm -rf "$PORT_DST"
 cp -a "$PORT_SRC" "$PORT_DST"
 
-.venv/bin/python tools/dc.py setup "$PORT_DST" --disc "$DISC_PATH"
+.venv/bin/python tools/dc.py deps && .venv/bin/python tools/dc.py setup "$PORT_DST" --disc "$DISC_PATH" && rm -rf "$PORT_DST/build" && cmake -S "$PORT_DST" -B "$PORT_DST/build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DDREAMCOMP_DIR="$DC_DIR" -DDREAMCOMP_FRONTEND=OFF
 # Pass -DDREAMCOMP_FRONTEND=OFF if CMake hangs while downloading Inter/PromptFont fonts
 CMAKE_ARGS="${CMAKE_ARGS:-}" .venv/bin/python tools/dc.py build "$PORT_DST"
 [[ -n "${DISC_RU:-}" && -f "$DISC_RU" ]] && .venv/bin/python "$PORT_DST/tools/extract_paradox_mod.py" "$DISC_RU" "$WORK_DIR/Ecco_the_Dolphin_PC/profiles/paradox_rus/dreamcomp/ecco/mods/rus_paradox"
