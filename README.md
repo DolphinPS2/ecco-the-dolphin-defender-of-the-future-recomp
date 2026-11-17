@@ -36,7 +36,11 @@ recompiled code against the engine's SH-4 interpreter.
 - Saves to a per-user virtual memory card; rumble; keyboard and gamepad, rebindable in game
 - Texture dumping and replacement packs, file mods (dreamcomp `docs/TEXTURE-PACKS.md`, `docs/MODS.md`)
 
-## One-Click Automated Build (Windows & Linux)...## Building (Windows)
+## One-Click Automated Build (Windows & Linux)
+
+1. Place your **Europe** disc image...
+
+## Building (Windows)
 
 Tested and verified on Windows 10/11 x64. See **[docs/WINDOWS-BUILD.md](docs/WINDOWS-BUILD.md)** for full prerequisites, step-by-step PowerShell commands, standalone launcher/installer sources (`windows/`), and solutions to known Windows build traps:
 
