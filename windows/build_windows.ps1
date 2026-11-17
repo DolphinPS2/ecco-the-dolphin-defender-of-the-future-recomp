@@ -15,7 +15,7 @@ if (Test-Path "C:\Program Files\LLVM\bin") { $env:Path += ";C:\Program Files\LLV
 
 $portSrc = Split-Path -Parent $PSScriptRoot
 $root = Split-Path -Parent $portSrc
-$dcDir = Join-Path $root "dreamcomp"
+$dcDir = Join-Path $env:SystemDrive "EccoBuild\dreamcomp"
 if (-not (Test-Path $dcDir)) {
     git clone -b linux-ecco --recurse-submodules https://github.com/cherryduck/dreamcomp.git $dcDir
 }
@@ -46,6 +46,7 @@ if ($discRu -and (Test-Path $discRu)) {
 }
 Pop-Location
 Write-Host "=== Build complete! Output folder: $outDir ===" -ForegroundColor Green
+
 
 
 
