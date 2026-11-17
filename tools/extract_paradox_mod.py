@@ -30,7 +30,7 @@ def extract_cdi(disc_path, out_dir):
         if r_lba > 16:
             diff_sec = round((rec_start - pvd_pos) / sec_size)
             cand_lba = r_lba - 16 - diff_sec
-            if cand_lba > 0:
+            if cand_lba >= 0:
                 base_off = pvd_pos - (16 + cand_lba) * sec_size
     def read_extent(lba, size):
         out = bytearray()
