@@ -30,7 +30,7 @@ Copy-Item $portSrc $portLink -Recurse -Force
 
 cmake -S engine/third_party/libchdr -B .deps/libchdr-build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON; cmake --build .deps/libchdr-build; $env:DCDISC_LIBCHDR = (Resolve-Path ".deps\libchdr-build\chdr.dll").Path; .\.venv\Scripts\python tools/dc.py deps; .\.venv\Scripts\python tools/dc.py setup $portLink --disc "$discEu"; Remove-Item "$portLink\build" -Recurse -Force -ErrorAction SilentlyContinue; cmake -S $portLink -B "$portLink\build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DDREAMCOMP_DIR="$dcDir" -DDREAMCOMP_FRONTEND=OFF
 .\.venv\Scripts\python tools/dc.py build $portLink
-if ($discRu -and (Test-Path $discRu)) { .\.venv\Scripts\python "$portLink\tools\extract_paradox_mod.py" "$discRu" "$root\Ecco_the_Dolphin_Windows\profiles\paradox_rus\dreamcomp\ecco\mods\rus_paradox" }
+
 
 $outDir = Join-Path $root "Ecco_the_Dolphin_Windows"
 New-Item -ItemType Directory -Force -Path "$outDir\engine", "$outDir\disc", "$outDir\profiles\europe\dreamcomp\ecco", "$outDir\profiles\paradox_rus\dreamcomp\ecco" | Out-Null
@@ -46,6 +46,7 @@ if ($discRu -and (Test-Path $discRu)) {
 }
 Pop-Location
 Write-Host "=== Build complete! Output folder: $outDir ===" -ForegroundColor Green
+
 
 
 
