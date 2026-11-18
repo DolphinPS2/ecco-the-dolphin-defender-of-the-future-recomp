@@ -31,7 +31,7 @@ Copy-Item ".deps\SDL3-*\lib\x64\SDL3.dll" "$outDir\engine\" -Force -ErrorAction 
 Copy-Item ".deps\libchdr-build\chdr.dll" "$outDir\engine\" -Force -ErrorAction SilentlyContinue
 Copy-Item "$portLink\game\ecco.toml", "$portLink\game\hud_overrides.ini" "$outDir\engine\" -Force -ErrorAction SilentlyContinue
 Copy-Item -LiteralPath $discEu -Destination "$outDir\disc\ecco_eu$([IO.Path]::GetExtension($discEu))" -Force
-$z = "$env:TEMP\ecco_launcher.zip"
+$ProgressPreference = "SilentlyContinue"; $z = "$env:TEMP\ecco_launcher.zip"
 Invoke-WebRequest -Uri "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_DC_PC_Launcher_Win_Linux.zip" -OutFile $z
 Expand-Archive -Path $z -DestinationPath $outDir -Force
 Copy-Item "$PSScriptRoot\launcher.py" "$outDir\launcher.py" -Force
@@ -48,7 +48,7 @@ if ($discRu -and (Test-Path -LiteralPath $discRu)) {
             $chdZip = "$env:TEMP\chdman_win64.zip"
             Invoke-WebRequest -Uri "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/chdman_win64.zip" -OutFile $chdZip
             Expand-Archive -Path $chdZip -DestinationPath $chdDir -Force
-            $found = Get-ChildItem $chdDir -Recurse -Filter "chdman.exe" | Select-Object -First 1
+            $found = Get-ChildItem $chdDir -Recurse -Filter "cdirip.exe" | Select-Object -First 1
             if ($found -and $found.FullName -ne $chdExe) { Copy-Item $found.FullName $chdExe -Force }
         }
         $env:Path = "$chdDir;$env:Path"
