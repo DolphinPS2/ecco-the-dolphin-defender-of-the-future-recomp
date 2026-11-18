@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -euo pipefail
 
 echo "=== Ecco the Dolphin: Automated Linux x64 Build ==="
@@ -38,7 +38,7 @@ cmake -S "$PORT_DST" -B "$PORT_DST/build" -G Ninja -DCMAKE_BUILD_TYPE=Release -D
 OUT_DIR="$WORK_DIR/Ecco_the_Dolphin_PC"
 mkdir -p "$OUT_DIR/engine" "$OUT_DIR/disc" "$OUT_DIR/profiles/europe/dreamcomp/ecco" "$OUT_DIR/profiles/paradox_rus/dreamcomp/ecco"
 cp -f "$PORT_DST/build/game/ecco-the-dolphin-defender-of-the-future-recomp" "$OUT_DIR/engine/"
-cp -f "$PORT_DST/game/ecco.toml" "$PORT_DST/game/hud_overrides.ini" "$OUT_DIR/engine/" 2>/dev/null || true
+cp -a "$PORT_DST/game/extracted" "$OUT_DIR/engine/" 2>/dev/null || true; cp -f "$PORT_DST/game/ecco.toml" "$PORT_DST/game/hud_overrides.ini" "$OUT_DIR/engine/" 2>/dev/null || true
 EXT="${DISC_PATH##*.}"
 cp -f "$DISC_PATH" "$OUT_DIR/disc/ecco_eu.$EXT"
 
