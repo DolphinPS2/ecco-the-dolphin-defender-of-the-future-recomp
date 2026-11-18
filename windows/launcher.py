@@ -87,7 +87,7 @@ def main():
     elif "--paradox" in sys.argv: run_engine(1)
     setup_portable_env("paradox_rus")
     intro = os.path.join(MEDIA_DIR, "intro_2k.mp4")
-    if os.path.exists(intro): subprocess.run([FFPLAY_BIN, "-fs", "-autoexit", "-noborder", "-loglevel", "quiet", intro], creationflags=subprocess.CREATE_NO_WINDOW)
+    if os.path.exists(intro) and FFPLAY_BIN and (os.path.exists(FFPLAY_BIN) or shutil.which(FFPLAY_BIN)): subprocess.run([FFPLAY_BIN, "-fs", "-autoexit", "-noborder", "-loglevel", "quiet", intro], creationflags=subprocess.CREATE_NO_WINDOW)
     pygame.init(); pygame.mixer.init(frequency=48000, size=-16, channels=2, buffer=1024); pygame.joystick.init()
     joys = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
     for j in joys: j.init()

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "=== Ecco the Dolphin: Automated Linux x64 Build ==="
+echo "=== Ecco the Dolphin: Automated Linux x64 Build (Etalon Layout) ==="
 read -rp "1. Enter path to Europe disc image (.chd / .cue / .gdi) [REQUIRED]: " DISC_PATH
 read -rp "2. Enter path to Paradox RUS disc image (.cdi / .chd / .gdi) [Optional]: " DISC_RU
 if [[ ! -f "$DISC_PATH" ]]; then
@@ -9,7 +9,7 @@ if [[ ! -f "$DISC_PATH" ]]; then
     exit 1
 fi
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE}")" && pwd)"
 PORT_SRC="$(dirname "$SCRIPT_DIR")"
 WORK_DIR="$(dirname "$PORT_SRC")"
 DC_DIR="$WORK_DIR/dreamcomp"
@@ -38,7 +38,10 @@ cmake -S "$PORT_DST" -B "$PORT_DST/build" -G Ninja -DCMAKE_BUILD_TYPE=Release -D
 OUT_DIR="$WORK_DIR/Ecco_the_Dolphin_PC"
 mkdir -p "$OUT_DIR/engine" "$OUT_DIR/disc" "$OUT_DIR/profiles/europe/dreamcomp/ecco" "$OUT_DIR/profiles/paradox_rus/dreamcomp/ecco"
 cp -f "$PORT_DST/build/game/ecco-the-dolphin-defender-of-the-future-recomp" "$OUT_DIR/engine/"
-cp -a "$PORT_DST/game/extracted" "$OUT_DIR/engine/" 2>/dev/null || true; cp -f "$PORT_DST/game/ecco.toml" "$PORT_DST/game/hud_overrides.ini" "$OUT_DIR/engine/" 2>/dev/null || true
+cp -f "$PORT_DST/game/ecco.toml" "$PORT_DST/game/hud_overrides.ini" "$OUT_DIR/engine/" 2>/dev/null || true
+if [[ -d "$PORT_DST/game/extracted" ]]; then
+    cp -a "$PORT_DST/game/extracted" "$OUT_DIR/engine/extracted"
+fi
 EXT="${DISC_PATH##*.}"
 cp -f "$DISC_PATH" "$OUT_DIR/disc/ecco_eu.$EXT"
 
