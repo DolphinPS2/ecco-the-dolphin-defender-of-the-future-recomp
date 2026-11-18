@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, sys, shutil, subprocess, urllib.request, zipfile, tempfile, threading
+import os, sys, time, shutil, subprocess, urllib.request, zipfile, tempfile, threading
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
@@ -53,6 +53,26 @@ class EccoLinuxInstaller(tk.Tk):
     def _set_progress(self, val, text):
         self.after(0, lambda: (self.prog.configure(value=val), self.status_var.set(text)))
 
+    def _download_with_progress(self, url, dst, label, p_start, p_end):
+        t0 = time.time()
+        last_ui = [0.0]
+        def hook(blocks, block_size, total_size):
+            now = time.time()
+            if now - last_ui[0] < 0.2 and blocks * block_size < total_size:
+                return
+            last_ui[0] = now
+            done = min(blocks * block_size, total_size) if total_size > 0 else blocks * block_size
+            mb_done = done / (1024 * 1024)
+            spd = (done / max(now - t0, 0.01)) / (1024 * 1024)
+            if total_size > 0:
+                pct = int(done * 100 / total_size)
+                mb_tot = total_size / (1024 * 1024)
+                bar_val = p_start + (p_end - p_start) * (done / total_size)
+                self._set_progress(bar_val, f"{label}: {pct}% ({mb_done:.1f} / {mb_tot:.1f} МБ, {spd:.2f} МБ/с)")
+            else:
+                self._set_progress(p_start, f"{label}: {mb_done:.1f} МБ ({spd:.2f} МБ/с)")
+        urllib.request.urlretrieve(url, dst, reporthook=hook)
+
     def _start(self):
         eu = self.eu_disc.get().strip()
         if not eu or not os.path.isfile(eu):
@@ -67,24 +87,24 @@ class EccoLinuxInstaller(tk.Tk):
             eu = os.path.abspath(self.eu_disc.get().strip())
             ru = os.path.abspath(self.ru_disc.get().strip()) if self.ru_disc.get().strip() else ""
             os.makedirs(out_dir, exist_ok=True)
-            self._set_progress(15, "Загрузка DC PC графического лаунчера с GitHub...")
             tmp_l = os.path.join(tempfile.gettempdir(), "ecco_launcher_linux.zip")
-            urllib.request.urlretrieve(LAUNCHER_ZIP_URL, tmp_l)
+            self._download_with_progress(LAUNCHER_ZIP_URL, tmp_l, "Загрузка DC PC лаунчера", 5, 45)
+            self._set_progress(47, "Распаковка графического лаунчера...")
             with zipfile.ZipFile(tmp_l, "r") as zf: zf.extractall(out_dir)
 
-            self._set_progress(45, "Загрузка скомпилированного движка Linux x64 с GitHub...")
             tmp_e = os.path.join(tempfile.gettempdir(), "ecco_engine_linux.zip")
-            urllib.request.urlretrieve(ENGINE_ZIP_URL, tmp_e)
+            self._download_with_progress(ENGINE_ZIP_URL, tmp_e, "Загрузка движка Linux x64", 50, 72)
+            self._set_progress(74, "Распаковка бинарника движка...")
             with zipfile.ZipFile(tmp_e, "r") as zf: zf.extractall(out_dir)
             b_dst = os.path.join(out_dir, "engine/ecco-the-dolphin-defender-of-the-future-recomp")
             os.chmod(b_dst, 0o755)
 
-            self._set_progress(70, "Копирование европейского образа диска...")
+            self._set_progress(78, "Копирование европейского образа диска...")
             os.makedirs(os.path.join(out_dir, "disc"), exist_ok=True)
             shutil.copy2(eu, os.path.join(out_dir, "disc", "ecco_eu" + os.path.splitext(eu)))
 
             if ru and os.path.isfile(ru):
-                self._set_progress(82, "Распаковка русского перевода и озвучки Paradox RUS...")
+                self._set_progress(85, "Распаковка русского перевода и озвучки Paradox RUS...")
                 t_dir = os.path.join(out_dir, "tools"); os.makedirs(t_dir, exist_ok=True)
                 c_src = os.path.join(self.repo_root, "linux/cdirip")
                 c_files = [os.path.join(c_src, f) for f in os.listdir(c_src) if f.endswith(".c")]
