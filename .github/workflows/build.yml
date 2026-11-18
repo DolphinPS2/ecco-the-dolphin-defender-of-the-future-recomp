@@ -1,8 +1,9 @@
-﻿name: Build Launcher & Tools (Windows & Linux)
+name: Build Launcher and Tools
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
@@ -14,7 +15,7 @@ jobs:
         with:
           path: port
 
-      - name: Checkout dreamcomp (linux-ecco)
+      - name: Checkout dreamcomp
         uses: actions/checkout@v4
         with:
           repository: cherryduck/dreamcomp
@@ -27,14 +28,14 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Verify Python scripts & Run Repo Audit
+      - name: Verify Python scripts and Audit
         env:
           PYTHONUTF8: "1"
         run: |
           python -m py_compile port/windows/launcher.py port/tools/extract_paradox_mod.py
           python dreamcomp/tools/audit.py port
 
-      - name: Build Native Launcher Stub & chdr.dll
+      - name: Build Native Stub and chdr.dll
         uses: ilammy/msvc-dev-cmd@v1
         with:
           arch: x64
@@ -44,8 +45,9 @@ jobs:
           cl /O2 /EHsc port/windows/ecco_stub.cpp /Fe:Ecco_the_Dolphin.exe /link user32.lib shell32.lib /SUBSYSTEM:WINDOWS
 
       - name: Package Windows Starter Kit
+        shell: bash
         run: |
-          mkdir dist-win
+          mkdir -p dist-win
           cp Ecco_the_Dolphin.exe chdr-build/chdr.dll port/windows/launcher.py port/windows/build_windows.bat port/windows/build_windows.ps1 dist-win/
 
       - name: Upload Windows Starter Kit
