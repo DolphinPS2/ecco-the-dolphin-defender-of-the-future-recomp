@@ -2,7 +2,6 @@
 import os, sys, struct, fnmatch
 
 PATTERNS = ("*.GDE", "*.GSG", "*.INP", "0GDTEX.PVR", "AUDIO64.DRV", "CONFIG.TXT", "MUSIC_*.AFS", "SOUND/*.KAT")
-TRACK_BASES = {0: 4800680, 1: -201634714, 2: -13265287, 3: -67769496, 4: -209251672}
 
 def match_name(rel_path):
     head, _, _ = rel_path.replace("\\", "/").lstrip("/").partition(";")
@@ -25,9 +24,12 @@ def extract_cdi(disc_path, out_dir):
         while rem > 0:
             if is_dir:
                 pos = pvd_pos + (cur - 16) * sec_size
+            elif cur >= 400000:
+                pos = -278651896 + cur * sec_size
+            elif cur >= 259754:
+                pos = -255107352 + cur * sec_size
             else:
-                base = TRACK_BASES.get(cur // 100000, TRACK_BASES.get(0, 4800680))
-                pos = base + cur * sec_size
+                pos = 4800680 + cur * sec_size
             chunk = min(2048, rem)
             out.extend(blob[pos:pos + chunk])
             rem -= chunk
