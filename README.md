@@ -36,22 +36,24 @@ recompiled code against the engine's SH-4 interpreter.
 - Saves to a per-user virtual memory card; rumble; keyboard and gamepad, rebindable in game
 - Texture dumping and replacement packs, file mods (dreamcomp `docs/TEXTURE-PACKS.md`, `docs/MODS.md`)
 
-## Windows Installer & Dual-Version DC PC Launcher (Recommended)
+## Windows & Linux Installers + Dual-Version DC PC Launcher (Recommended)
 
-Download **[Ecco_the_Dolphin_Online_Setup.exe](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_Online_Setup.exe)** вЂ” a full Windows installer for this native Dreamcast-to-PC static recompilation port, featuring an interactive **DC PC Graphical Launcher** with support for two isolated game editions:
+Download the graphical installer for your platform to set up this native Dreamcast-to-PC static recompilation port with the interactive **DC PC Graphical Launcher** and two isolated game editions:
 
-- **Europe Original (MK-5103350, En / Fr / De / Es)** вЂ” authentic European Dreamcast release with widescreen (up to 21:9), up to 8x internal resolution, and high refresh rate interpolation.
-- **Paradox Russian Edition (Paradox RUS вЂ” Full Russian Text & Voiceover)** вЂ” automatically extracted from your Paradox .cdi / .chd / .gdi disc image during setup, with isolated settings and virtual memory card (VMU) saves so both editions coexist without conflicts.
+- **Windows Installer:** **[Ecco_the_Dolphin_Online_Setup.exe](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_Online_Setup.exe)** (with desktop, Start Menu, and taskbar shortcuts).
+- **Linux / Steam Deck Installer:** **[Ecco_the_Dolphin_Linux_Setup.run](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_Linux_Setup.run)** (fast prebuilt engine setup with `.desktop` application shortcuts).
+- **Europe Original (`MK-5103350`, En / Fr / De / Es)** - authentic European Dreamcast release with widescreen (up to 21:9), up to 8x internal resolution, and high refresh rate interpolation.
+- **Paradox Russian Edition (`Paradox RUS` - Full Russian Text & Voiceover)** - automatically extracted from your Paradox `.cdi` / `.chd` / `.gdi` disc image during setup, with isolated settings and virtual memory card (`VMU`) saves.
 
-### ????????? ?? Windows ? Linux (?? ??????? ?????)
+### Установка на Windows и Linux (на русском языке)
 
-- **Windows:** ???????? ? ????????? **[Ecco_the_Dolphin_Online_Setup.exe](https://github.comEcco_the_Dolphin_Online_Setup.exe)**, ???????? ????? ?????????, ?????? ? ??????? ???? ?????? ?????? (**Europe** `.chd`/`.cue`/`.gdi` ? ??????????? **Paradox RUS** `.cdi`/`.chd`/`.gdi`).
-- **Linux / Steam Deck:** ???????? **[Ecco_the_Dolphin_Linux_Setup.run](https://github.comEcco_the_Dolphin_Linux_Setup.run)** ? ????? ??????????, ???????? ??? ???????? ? ?????????:
+- **Windows:** Скачайте и запустите **[Ecco_the_Dolphin_Online_Setup.exe](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_Online_Setup.exe)**, выберите папку установки, ярлыки (Рабочий стол, меню «Пуск», Панель задач) и укажите ваши образы дисков (**Europe** `.chd`/`.cue`/`.gdi` и опционально **Paradox RUS** `.cdi`/`.chd`/`.gdi`).
+- **Linux / Steam Deck:** Скачайте **[Ecco_the_Dolphin_Linux_Setup.run](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_Linux_Setup.run)** в папку «Загрузки», откройте там терминал и выполните:
 ```bash
 chmod +x Ecco_the_Dolphin_Linux_Setup.run
 ./Ecco_the_Dolphin_Linux_Setup.run
 ```
-????????? ??????????? ?????? ????????? ? ??????? ????????, ??????? ?????, ??????? ????? ??????? ?????? ? ????????? ??????? `.desktop`.
+Откроется графический мастер установки с иконкой дельфина, выбором папки, выбором обоих образов дисков и созданием ярлыков `.desktop` в меню приложений.
 
 ## One-Click Automated Build (Windows & Linux)
 

@@ -3,8 +3,8 @@ import os, sys, shutil, subprocess, urllib.request, zipfile, tempfile, threading
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-REPO_URL = "https://github.com"
-LAUNCHER_ZIP_URL = "https://github.com"
+ENGINE_ZIP_URL = "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_Engine_Linux64.zip"
+LAUNCHER_ZIP_URL = "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_DC_PC_Launcher_Win_Linux.zip"
 
 class EccoLinuxInstaller(tk.Tk):
     def __init__(self):
@@ -14,12 +14,6 @@ class EccoLinuxInstaller(tk.Tk):
         self.resizable(False, False)
         self.base_dir = os.path.dirname(os.path.abspath(__file__))
         self.repo_root = os.path.dirname(self.base_dir)
-        ico_png = os.path.join(self.repo_root, "windows", "ecco.png")
-        if os.path.exists(ico_png):
-            try:
-                self.iconphoto(True, tk.PhotoImage(file=ico_png))
-            except Exception:
-                pass
         self.install_dir = tk.StringVar(value=os.path.expanduser("~/Games/Ecco_the_Dolphin"))
         self.eu_disc = tk.StringVar()
         self.ru_disc = tk.StringVar()
@@ -31,8 +25,7 @@ class EccoLinuxInstaller(tk.Tk):
         pad = {"padx": 16, "pady": 6}
         tk.Label(self, text="Ecco the Dolphin: Defender of the Future (Linux PC Port)", font=("Sans", 13, "bold")).pack(anchor="w", padx=16, pady=(14, 2))
         tk.Label(self, text="Нативный порт Dreamcast + DC PC графический лаунчер (Europe & Paradox RUS)", fg="#444").pack(anchor="w", padx=16, pady=(0, 10))
-        frm = tk.Frame(self)
-        frm.pack(fill="x", **pad)
+        frm = tk.Frame(self); frm.pack(fill="x", **pad)
         tk.Label(frm, text="Папка установки:").pack(anchor="w")
         r1 = tk.Frame(frm); r1.pack(fill="x", pady=2)
         tk.Entry(r1, textvariable=self.install_dir).pack(side="left", fill="x", expand=True)
@@ -67,53 +60,43 @@ class EccoLinuxInstaller(tk.Tk):
             return
         self.install_btn.config(state="disabled")
         threading.Thread(target=self._run, daemon=True).start()
+
     def _run(self):
         try:
             out_dir = os.path.abspath(os.path.expanduser(self.install_dir.get().strip()))
             eu = os.path.abspath(self.eu_disc.get().strip())
             ru = os.path.abspath(self.ru_disc.get().strip()) if self.ru_disc.get().strip() else ""
             os.makedirs(out_dir, exist_ok=True)
-            ws = os.path.expanduser("~/.cache/ecco_recomp_build"); os.makedirs(ws, exist_ok=True)
-            self._set_progress(15, "Клонирование dreamcomp (ветка linux-ecco)...")
-            dc_dir = os.path.join(ws, "dreamcomp")
-            if not os.path.isdir(dc_dir):
-                subprocess.run(["git", "clone", "-b", "linux-ecco", "--recurse-submodules", "https://github.com", dc_dir], check=True)
-            port_dir = os.path.join(dc_dir, "ports", "ecco-the-dolphin-defender-of-the-future-recomp")
-            if os.path.isfile(os.path.join(self.repo_root, "CMakeLists.txt")):
-                shutil.rmtree(port_dir, ignore_errors=True)
-                shutil.copytree(self.repo_root, port_dir, ignore=shutil.ignore_patterns(".git"))
-            elif not os.path.isdir(port_dir):
-                subprocess.run(["git", "clone", REPO_URL, port_dir], check=True)
-            self._set_progress(30, "Настройка Python venv...")
-            venv_dir = os.path.join(dc_dir, ".venv"); py_bin = os.path.join(venv_dir, "bin", "python")
-            if not os.path.isfile(py_bin):
-                subprocess.run([sys.executable, "-m", "venv", venv_dir], check=True)
-                subprocess.run([py_bin, "-m", "pip", "install", "-e", os.path.join(dc_dir, "engine/tools/dcdisc[test]"), "pillow"], check=True)
-            self._set_progress(50, "Компиляция нативного движка Ecco (C++20)...")
-            subprocess.run([py_bin, os.path.join(dc_dir, "tools/dc.py"), "setup", port_dir, "--disc", eu], check=True)
-            subprocess.run([py_bin, os.path.join(dc_dir, "tools/dc.py"), "build", port_dir], check=True)
-            self._set_progress(75, "Загрузка DC PC лаунчера с GitHub...")
-            tmp_zip = os.path.join(tempfile.gettempdir(), "ecco_launcher_linux.zip")
-            urllib.request.urlretrieve(LAUNCHER_ZIP_URL, tmp_zip)
-            with zipfile.ZipFile(tmp_zip, "r") as zf: zf.extractall(out_dir)
-            os.makedirs(os.path.join(out_dir, "engine"), exist_ok=True); os.makedirs(os.path.join(out_dir, "disc"), exist_ok=True)
+            self._set_progress(15, "Загрузка DC PC графического лаунчера с GitHub...")
+            tmp_l = os.path.join(tempfile.gettempdir(), "ecco_launcher_linux.zip")
+            urllib.request.urlretrieve(LAUNCHER_ZIP_URL, tmp_l)
+            with zipfile.ZipFile(tmp_l, "r") as zf: zf.extractall(out_dir)
+
+            self._set_progress(45, "Загрузка скомпилированного движка Linux x64 с GitHub...")
+            tmp_e = os.path.join(tempfile.gettempdir(), "ecco_engine_linux.zip")
+            urllib.request.urlretrieve(ENGINE_ZIP_URL, tmp_e)
+            with zipfile.ZipFile(tmp_e, "r") as zf: zf.extractall(out_dir)
             b_dst = os.path.join(out_dir, "engine/ecco-the-dolphin-defender-of-the-future-recomp")
-            shutil.copy2(os.path.join(port_dir, "build/game/ecco-the-dolphin-defender-of-the-future-recomp"), b_dst); os.chmod(b_dst, 0o755)
-            shutil.copy2(eu, os.path.join(out_dir, "disc", "ecco_eu" + os.path.splitext(eu)[1]))
+            os.chmod(b_dst, 0o755)
+
+            self._set_progress(70, "Копирование европейского образа диска...")
+            os.makedirs(os.path.join(out_dir, "disc"), exist_ok=True)
+            shutil.copy2(eu, os.path.join(out_dir, "disc", "ecco_eu" + os.path.splitext(eu)))
+
             if ru and os.path.isfile(ru):
-                self._set_progress(88, "Компиляция cdirip и распаковка Paradox RUS...")
+                self._set_progress(82, "Распаковка русского перевода и озвучки Paradox RUS...")
                 t_dir = os.path.join(out_dir, "tools"); os.makedirs(t_dir, exist_ok=True)
-                c_src = os.path.join(port_dir, "linux/cdirip")
+                c_src = os.path.join(self.repo_root, "linux/cdirip")
                 c_files = [os.path.join(c_src, f) for f in os.listdir(c_src) if f.endswith(".c")]
                 subprocess.run(["gcc", "-O2", *c_files, "-o", os.path.join(t_dir, "cdirip")], check=True)
                 env = os.environ.copy(); env["PATH"] = t_dir + ":" + env.get("PATH", "")
-                subprocess.run([py_bin, os.path.join(port_dir, "tools/extract_paradox_mod.py"), ru, os.path.join(out_dir, "profiles/paradox_rus/dreamcomp/ecco/mods/rus_paradox")], env=env, check=True)
-            self._set_progress(96, "Создание ярлыков .desktop...")
+                subprocess.run([sys.executable, os.path.join(self.repo_root, "tools/extract_paradox_mod.py"), ru, os.path.join(out_dir, "profiles/paradox_rus/dreamcomp/ecco/mods/rus_paradox")], env=env, check=True)
+
+            self._set_progress(95, "Создание ярлыков .desktop...")
             run_sh = os.path.join(out_dir, "Ecco_the_Dolphin.sh")
             with open(run_sh, "w", encoding="utf-8") as sf: sf.write(f"#!/usr/bin/env bash\ncd \"{out_dir}\"\nexec python3 \"{out_dir}/launcher.py\" \"$@\"\n")
             os.chmod(run_sh, 0o755)
             ico = os.path.join(out_dir, "ecco.png")
-            if not os.path.isfile(ico) and os.path.isfile(os.path.join(port_dir, "windows/ecco.png")): shutil.copy2(os.path.join(port_dir, "windows/ecco.png"), ico)
             de = f"[Desktop Entry]\nType=Application\nName=Ecco the Dolphin: Defender of the Future\nExec=\"{run_sh}\"\nIcon={ico}\nTerminal=false\nCategories=Game;\n"
             if self.create_menu.get():
                 ad = os.path.expanduser("~/.local/share/applications"); os.makedirs(ad, exist_ok=True)
@@ -123,9 +106,9 @@ class EccoLinuxInstaller(tk.Tk):
                 with open(dp, "w", encoding="utf-8") as df: df.write(de)
                 os.chmod(dp, 0o755)
             self._set_progress(100, "Готово!")
-            self.after(0, lambda: (messagebox.showinfo("Готово", f"Игра установлена в:\n{out_dir}"), self.destroy()))
+            self.after(0, lambda: (messagebox.showinfo("Готово", f"Игра успешно установлена в:\n{out_dir}"), self.destroy()))
         except Exception as exc:
-            self.after(0, lambda: (messagebox.showerror("Ошибка", str(exc)), self.install_btn.config(state="normal")))
+            self.after(0, lambda msg=str(exc): (messagebox.showerror("Ошибка", msg), self.install_btn.config(state="normal")))
 
 if __name__ == "__main__":
     EccoLinuxInstaller().mainloop()
