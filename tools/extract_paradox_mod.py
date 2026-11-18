@@ -7,6 +7,44 @@ def match_name(rel_path):
     head, _, _ = rel_path.replace("\\", "/").lstrip("/").partition(";")
     return head if any(fnmatch.fnmatch(head.upper(), p) for p in PATTERNS) else None
 
+def parse_cdi_tracks(blob):
+    # DiscJuggler v2/v3/v3.5 footer: last 8 bytes = (version, header_offset_from_end)
+    ver, h_off = struct.unpack_from("<II", blob, len(blob) - 8)
+    pos = len(blob) - h_off if ver == 0x80000006 else h_off
+    sessions = struct.unpack_from("<H", blob, pos)[0]
+    pos += 2
+    tracks = []
+    cur_byte = 0
+    cur_lba = 0
+    for _ in range(sessions):
+        ntracks = struct.unpack_from("<H", blob, pos)[0]
+        pos += 2
+        for _ in range(ntracks):
+            # Skip variable pre-track marker (00 00 01 00 00 00 FF FF FF FF repeated)
+            while blob[pos:pos+4] == b"\x00\x00\x01\x00":
+                pos += 10
+            pos += 4 # unknown 4 bytes
+            fn_len = blob[pos]
+            pos += 1 + fn_len + 11 + 4 + 4
+            pregap, length = struct.unpack_from("<II", blob, pos)
+            pos += 14
+            mode = struct.unpack_from("<I", blob, pos)[0]
+            pos += 12
+            start_lba = struct.unpack_from("<I", blob, pos)[0]
+            total_len = struct.unpack_from("<I", blob, pos + 4)[0]
+            pos += 29
+            if ver != 0x80000004:
+                pos += 5
+                if struct.unpack_from("<I", blob, pos)[0] == 0xFFFFFFFF:
+                    pos += 78
+                pos += 4
+            sec_size = 2048 if mode == 0 else (2336 if mode == 1 else 2352)
+            data_off = 24 if sec_size == 2352 else (8 if sec_size == 2336 else 0)
+            tracks.append((start_lba, total_len, cur_byte + pregap * sec_size, sec_size, data_off))
+            cur_byte += total_len * sec_size
+        pos += 12
+    return tracks
+
 def extract_cdi(disc_path, out_dir):
     with open(disc_path, "rb") as f:
         blob = f.read()
@@ -17,19 +55,27 @@ def extract_cdi(disc_path, out_dir):
     pvd = blob[pvd_pos:pvd_pos + 2048]
     root_lba, = struct.unpack_from("<I", pvd, 158)
     root_len, = struct.unpack_from("<I", pvd, 166)
+    try:
+        tracks = parse_cdi_tracks(blob)
+    except Exception:
+        tracks = []
+    def lba_to_pos(cur, is_dir=False):
+        if is_dir:
+            return pvd_pos + (cur - 16) * sec_size
+        for s_lba, t_len, base_b, s_sz, d_off in tracks:
+            if s_lba <= cur < s_lba + t_len:
+                return base_b + (cur - s_lba) * s_sz + d_off
+        if cur >= 400000:
+            return -278651896 + cur * sec_size
+        if cur >= 259754:
+            return -255107352 + cur * sec_size
+        return 4800680 + cur * sec_size
     def read_extent(lba, size, is_dir=False):
         out = bytearray()
         rem = size
         cur = lba
         while rem > 0:
-            if is_dir:
-                pos = pvd_pos + (cur - 16) * sec_size
-            elif cur >= 400000:
-                pos = -278651896 + cur * sec_size
-            elif cur >= 259754:
-                pos = -255107352 + cur * sec_size
-            else:
-                pos = 4800680 + cur * sec_size
+            pos = lba_to_pos(cur, is_dir)
             chunk = min(2048, rem)
             out.extend(blob[pos:pos + chunk])
             rem -= chunk
