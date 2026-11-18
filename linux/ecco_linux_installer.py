@@ -106,9 +106,7 @@ class EccoLinuxInstaller(tk.Tk):
             if ru and os.path.isfile(ru):
                 self._set_progress(85, "Распаковка русского перевода и озвучки Paradox RUS...")
                 t_dir = os.path.join(out_dir, "tools"); os.makedirs(t_dir, exist_ok=True)
-                c_src = os.path.join(self.repo_root, "linux/cdirip")
-                c_files = [os.path.join(c_src, f) for f in os.listdir(c_src) if f.endswith(".c")]
-                subprocess.run(["gcc", "-O2", "-std=gnu89", "-Wno-implicit-function-declaration", *c_files, "-o", os.path.join(t_dir, "cdirip")], check=True)
+                os.chmod(os.path.join(t_dir, "cdirip"), 0o755)
                 env = os.environ.copy(); env["PATH"] = t_dir + ":" + env.get("PATH", "")
                 subprocess.run([sys.executable, os.path.join(self.repo_root, "tools/extract_paradox_mod.py"), ru, os.path.join(out_dir, "profiles/paradox_rus/dreamcomp/ecco/mods/rus_paradox")], env=env, check=True)
 
