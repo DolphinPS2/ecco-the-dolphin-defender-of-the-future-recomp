@@ -1,4 +1,3 @@
-import shutil
 #!/usr/bin/env python3
 import os, sys, time, math, shutil, subprocess, threading
 os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
@@ -8,10 +7,10 @@ from pygame._sdl2.video import Window, Renderer, Texture
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MEDIA_DIR = os.path.join(BASE_DIR, "media")
 ENGINE_DIR = os.path.join(BASE_DIR, "engine")
-DISC_PATH = next((os.path.join(BASE_DIR, "disc", f) for f in os.listdir(os.path.join(BASE_DIR, "disc")) if f.startswith("ecco_eu.")), os.path.join(BASE_DIR, "disc", "ecco_eu.chd"))
+DISC_PATH = os.path.join(BASE_DIR, "disc", "ecco_eu.chd")
 BIN_PATH = os.path.join(ENGINE_DIR, "ecco-the-dolphin-defender-of-the-future-recomp.exe")
-FFMPEG_BIN = os.path.join(BASE_DIR, "runtime", "ffmpeg.exe") if os.path.exists(os.path.join(BASE_DIR, "runtime", "ffmpeg.exe")) else shutil.which("ffmpeg")
-FFPLAY_BIN = os.path.join(BASE_DIR, "runtime", "ffplay.exe") if os.path.exists(os.path.join(BASE_DIR, "runtime", "ffplay.exe")) else shutil.which("ffplay")
+FFMPEG_BIN = os.path.join(BASE_DIR, "runtime", "ffmpeg.exe") if os.path.exists(os.path.join(BASE_DIR, "runtime", "ffmpeg.exe")) else "ffmpeg"
+FFPLAY_BIN = os.path.join(BASE_DIR, "runtime", "ffplay.exe") if os.path.exists(os.path.join(BASE_DIR, "runtime", "ffplay.exe")) else "ffplay"
 TOML_PATH = os.path.join(ENGINE_DIR, "ecco.toml")
 W, H, UI_FPS, VID_FPS = 2560, 1440, 60, 30
 
@@ -20,21 +19,19 @@ def setup_portable_env(choice_name):
 
 def run_engine(choice):
     prof_name = "europe" if choice == 0 else "paradox_rus"
-    prof_dir = setup_portable_env(prof_name)
+    prof_root = setup_portable_env(prof_name)
+    cfg_dir = os.path.join(prof_root, "dreamcomp", "ecco")
+    os.makedirs(cfg_dir, exist_ok=True)
+    settings_path = os.path.join(cfg_dir, "settings.ini")
+    vmu_path = os.path.join(cfg_dir, "vmu_a1.bin")
+    mod_dir = os.path.join(cfg_dir, "mods", "rus_paradox")
     os.chdir(ENGINE_DIR)
     env = os.environ.copy()
-    if os.name == "nt":
-        env["APPDATA"] = prof_dir
-    else:
-        env["XDG_CONFIG_HOME"] = prof_dir
-    cmd = [BIN_PATH, "--config", TOML_PATH, "--disc", DISC_PATH, "--window", "--fullscreen", "--widescreen", "--scale", "3", "--interpolate-auto", "--soft-clip"]
-    if os.name == "nt":
-        cmd += ["--present-path", "dxgi"]
-    mod_dir = os.path.join(prof_dir, "dreamcomp", "ecco", "mods", "rus_paradox")
+    env["APPDATA"] = prof_root
+    args = [BIN_PATH, "--config", TOML_PATH, "--disc", DISC_PATH, "--settings", settings_path, "--vmu", vmu_path, "--window", "--fullscreen", "--widescreen", "--scale", "3", "--interpolate-auto", "--soft-clip", "--present-path", "dxgi"]
     if choice == 1 and os.path.isdir(mod_dir):
-        cmd += ["--mod", mod_dir]
-    kw = {"creationflags": subprocess.DETACHED_PROCESS} if os.name == "nt" else {}
-    subprocess.Popen(cmd, env=env, **kw)
+        args += ["--mod", mod_dir]
+    subprocess.Popen(args, env=env, creationflags=subprocess.DETACHED_PROCESS)
     time.sleep(0.5)
     pygame.quit()
     sys.exit(0)
@@ -54,7 +51,6 @@ class GPUVideoStream:
     def _worker(self):
         if self.delay > 0: time.sleep(self.delay)
         if not self.running: return
-        if not FFMPEG_BIN or not os.path.exists(self.path): return
         cmd = [FFMPEG_BIN, "-loglevel", "quiet", "-stream_loop", "-1"] + (["-c:v", "libvpx-vp9"] if self.alpha else [])
         vf = f"scale={self.w}:{self.h}:flags=bilinear,fps={VID_FPS}" + (",unpremultiply=inplace=1" if self.alpha else "")
         cmd += ["-i", self.path, "-vf", vf, "-f", "rawvideo", "-pix_fmt", self.pix_fmt, "-"]
@@ -87,7 +83,7 @@ def main():
     elif "--paradox" in sys.argv: run_engine(1)
     setup_portable_env("paradox_rus")
     intro = os.path.join(MEDIA_DIR, "intro_2k.mp4")
-    if os.path.exists(intro) and FFPLAY_BIN and (os.path.exists(FFPLAY_BIN) or shutil.which(FFPLAY_BIN)): subprocess.run([FFPLAY_BIN, "-fs", "-autoexit", "-noborder", "-loglevel", "quiet", intro], creationflags=subprocess.CREATE_NO_WINDOW)
+    if os.path.exists(intro): subprocess.run([FFPLAY_BIN, "-fs", "-autoexit", "-noborder", "-loglevel", "quiet", intro], creationflags=subprocess.CREATE_NO_WINDOW)
     pygame.init(); pygame.mixer.init(frequency=48000, size=-16, channels=2, buffer=1024); pygame.joystick.init()
     joys = [pygame.joystick.Joystick(i) for i in range(pygame.joystick.get_count())]
     for j in joys: j.init()

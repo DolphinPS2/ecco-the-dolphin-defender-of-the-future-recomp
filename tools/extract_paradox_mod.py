@@ -108,6 +108,7 @@ def extract_cdi(disc_path, out_dir):
                 if matched:
                     dst = os.path.join(out_dir, *matched.split("/"))
                     os.makedirs(os.path.dirname(dst), exist_ok=True)
+                    if os.path.exists(dst): os.chmod(dst, 0o666)
                     with open(dst, "wb") as wf:
                         wf.write(read_extent(elba, elen))
                     count += 1
@@ -130,10 +131,12 @@ def extract_from_disc(disc_path, out_dir):
                 if matched:
                     dst = os.path.join(out_dir, *matched.split("/"))
                     os.makedirs(os.path.dirname(dst), exist_ok=True)
+                    if os.path.exists(dst): os.chmod(dst, 0o666)
                     with open(dst, "wb") as f:
                         f.write(data)
                     count += 1
     cfg = os.path.join(os.path.dirname(os.path.dirname(out_dir)), "settings.ini")
+    if os.path.exists(cfg): os.chmod(cfg, 0o666)
     with open(cfg, "w", encoding="utf-8") as sf:
         sf.write("mods = rus_paradox\n")
     print(f"Extracted {count} Paradox RUS mod files into {out_dir}")
