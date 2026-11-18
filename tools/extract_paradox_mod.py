@@ -27,7 +27,7 @@ def extract_cdi(disc_path, out_dir):
             elif cur >= 400000:
                 pos = -278651896 + cur * sec_size
             elif cur >= 259754:
-                pos = -882414720 + cur * sec_size
+                pos = -255107352 + cur * sec_size
             else:
                 pos = 4800680 + cur * sec_size
             chunk = min(2048, rem)
