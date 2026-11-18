@@ -85,9 +85,8 @@ def extract_from_disc(disc_path, out_dir):
                         f.write(data)
                     count += 1
     cfg = os.path.join(os.path.dirname(os.path.dirname(out_dir)), "settings.ini")
-    if not os.path.exists(cfg):
-        with open(cfg, "w", encoding="utf-8") as sf:
-            sf.write("mods = rus_paradox\n")
+    with open(cfg, "w", encoding="utf-8") as sf:
+        sf.write("mods = rus_paradox\n")
     print(f"Extracted {count} Paradox RUS mod files into {out_dir}")
 
 if __name__ == "__main__":
