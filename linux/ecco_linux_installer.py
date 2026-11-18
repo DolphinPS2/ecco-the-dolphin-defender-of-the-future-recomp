@@ -123,18 +123,7 @@ class EccoLinuxInstaller(tk.Tk):
             os.makedirs(ico_dir, exist_ok=True)
             ico_dst = os.path.join(ico_dir, "ecco-the-dolphin.png")
             if os.path.isfile(ico_src): shutil.copy2(ico_src, ico_dst)
-            de = f"[Desktop Entry]
-Version=1.0
-Type=Application
-Name=Ecco the Dolphin: Defender of the Future
-Comment=Native PC Port (Europe & Paradox RUS)
-Exec={run_sh}
-Icon=ecco-the-dolphin
-Path={out_dir}
-Terminal=false
-StartupNotify=true
-Categories=Game;AdventureGame;
-"
+            de = f"[Desktop Entry]\nVersion=1.0\nType=Application\nName=Ecco the Dolphin: Defender of the Future\nComment=Native PC Port (Europe & Paradox RUS)\nExec={run_sh}\nIcon=ecco-the-dolphin\nPath={out_dir}\nTerminal=false\nStartupNotify=true\nCategories=Game;AdventureGame;\n"
             if self.create_menu.get():
                 ad = os.path.expanduser("~/.local/share/applications"); os.makedirs(ad, exist_ok=True)
                 mp = os.path.join(ad, "ecco-the-dolphin.desktop")
