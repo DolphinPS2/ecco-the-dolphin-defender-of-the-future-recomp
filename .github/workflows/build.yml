@@ -1,4 +1,4 @@
-﻿name: Build Windows & Linux Engine
+﻿name: Build Launcher & Tools (Windows & Linux)
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-windows:
+  build-windows-pack:
     runs-on: windows-latest
     steps:
       - name: Checkout port
@@ -25,76 +25,42 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
-      - name: Install Python deps & SDL3
-        working-directory: dreamcomp
-        run: |
-          python -m pip install -e "engine/tools/dcdisc[test]" pillow
-          python tools/dc.py deps
-
-      - name: Configure & Build libchdr + Engine (MSVC / clang-cl)
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          arch: x64
+      - name: Verify Python scripts & Run Repo Audit
         env:
           PYTHONUTF8: "1"
         run: |
-          cmake -S dreamcomp/engine/third_party/libchdr -B dreamcomp/.deps/libchdr-build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
-          cmake --build dreamcomp/.deps/libchdr-build
-          cmake -S port -B build-win -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DDREAMCOMP_DIR="${{ github.workspace }}/dreamcomp" -DDREAMCOMP_FRONTEND=OFF
-          cmake --build build-win
+          python -m py_compile port/windows/launcher.py port/tools/extract_paradox_mod.py
+          python dreamcomp/tools/audit.py port
 
-      - name: Package Windows Engine Artifact
+      - name: Build Native Launcher Stub & chdr.dll
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
         run: |
-          mkdir -p dist-win/engine
-          cp build-win/game/ecco-the-dolphin-defender-of-the-future-recomp.exe dist-win/engine/
-          cp dreamcomp/.deps/SDL3-*/lib/x64/SDL3.dll dist-win/engine/
-          cp dreamcomp/.deps/libchdr-build/chdr.dll dist-win/engine/
-          cp port/game/ecco.toml port/game/hud_overrides.ini dist-win/engine/ 2>/dev/null || true
-          cp port/windows/launcher.py dist-win/
+          cmake -S dreamcomp/engine/third_party/libchdr -B chdr-build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
+          cmake --build chdr-build
+          cl /O2 /EHsc port/windows/ecco_stub.cpp /Fe:Ecco_the_Dolphin.exe /link user32.lib shell32.lib /SUBSYSTEM:WINDOWS
 
-      - name: Upload Windows Engine
+      - name: Package Windows Starter Kit
+        run: |
+          mkdir dist-win
+          cp Ecco_the_Dolphin.exe chdr-build/chdr.dll port/windows/launcher.py port/windows/build_windows.bat port/windows/build_windows.ps1 dist-win/
+
+      - name: Upload Windows Starter Kit
         uses: actions/upload-artifact@v4
         with:
-          name: Ecco-Engine-Windows-x64
+          name: Ecco-Windows-Launcher-Kit
           path: dist-win/
 
-  build-linux:
+  verify-linux:
     runs-on: ubuntu-24.04
     steps:
-      - name: Install Linux dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y cmake ninja-build g++ libvulkan-dev glslang-tools libsdl3-dev libchdr-dev python3-venv
-
       - name: Checkout port
         uses: actions/checkout@v4
-        with:
-          path: port
 
-      - name: Checkout dreamcomp (linux-ecco)
-        uses: actions/checkout@v4
-        with:
-          repository: cherryduck/dreamcomp
-          ref: linux-ecco
-          submodules: recursive
-          path: dreamcomp
-
-      - name: Configure & Build Engine (Linux x64)
+      - name: Verify Linux scripts
         run: |
-          cmake -S port -B build-linux -G Ninja -DCMAKE_BUILD_TYPE=Release -DDREAMCOMP_DIR="${{ github.workspace }}/dreamcomp" -DDREAMCOMP_FRONTEND=OFF
-          cmake --build build-linux
-
-      - name: Package Linux Engine Artifact
-        run: |
-          mkdir -p dist-linux/engine
-          cp build-linux/game/ecco-the-dolphin-defender-of-the-future-recomp dist-linux/engine/
-          cp port/game/ecco.toml port/game/hud_overrides.ini dist-linux/engine/ 2>/dev/null || true
-          cp port/windows/launcher.py dist-linux/
-
-      - name: Upload Linux Engine
-        uses: actions/upload-artifact@v4
-        with:
-          name: Ecco-Engine-Linux-x64
-          path: dist-linux/
+          bash -n linux/build_linux.sh
+          python3 -m py_compile windows/launcher.py tools/extract_paradox_mod.py
