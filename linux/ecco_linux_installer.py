@@ -111,6 +111,10 @@ class EccoLinuxInstaller(tk.Tk):
                 subprocess.run([sys.executable, os.path.join(self.repo_root, "tools/extract_paradox_mod.py"), ru, os.path.join(out_dir, "profiles/paradox_rus/dreamcomp/ecco/mods/rus_paradox")], env=env, check=True)
 
             self._set_progress(95, "Создание ярлыков .desktop...")
+            for fn in os.listdir(out_dir):
+                if fn.startswith("media\\"):
+                    os.makedirs(os.path.join(out_dir, "media"), exist_ok=True)
+                    shutil.move(os.path.join(out_dir, fn), os.path.join(out_dir, "media", fn[6:]))
             run_sh = os.path.join(out_dir, "Ecco_the_Dolphin.sh")
             with open(run_sh, "w", encoding="utf-8") as sf: sf.write(f"#!/usr/bin/env bash\ncd \"{out_dir}\"\nexec python3 \"{out_dir}/launcher.py\" \"$@\"\n")
             os.chmod(run_sh, 0o755)
@@ -127,9 +131,10 @@ class EccoLinuxInstaller(tk.Tk):
                 if desk and os.path.isdir(desk):
                     dp = os.path.join(desk, "Ecco the Dolphin.desktop")
                     with open(dp, "w", encoding="utf-8") as df: df.write(de)
-                    os.chmod(dp, 0o755)
+                    os.chmod(dp, 0o755); subprocess.run(["gio", "set", dp, "metadata::trusted", "true"], stderr=subprocess.DEVNULL)
             subprocess.run(["kbuildsycoca6", "--noincremental"], check=False)
             subprocess.run(["kbuildsycoca6", "--noincremental"], check=False)
+            subprocess.run(["kbuildsycoca6", "--noincremental"], stderr=subprocess.DEVNULL)
             self._set_progress(100, "Готово!")
             self.after(0, lambda: (messagebox.showinfo("Готово", f"Игра успешно установлена в:\n{out_dir}"), self.destroy()))
         except Exception as exc:
