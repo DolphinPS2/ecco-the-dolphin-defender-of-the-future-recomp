@@ -39,10 +39,10 @@ $ico = if (Test-Path -LiteralPath "$outDir\ecco.ico") { "$outDir\ecco.ico" } els
 if (Test-Path -LiteralPath $ico) { $icoEsc = $ico.Replace("\", "\\"); "1 ICON `"$icoEsc`"" | Set-Content "$env:TEMP\ecco.rc" -Encoding ASCII; rc.exe /fo "$env:TEMP\ecco.res" "$env:TEMP\ecco.rc"; clang-cl /O2 /EHsc "$PSScriptRoot\ecco_stub.cpp" "$env:TEMP\ecco.res" /Fe:"$outDir\Ecco_the_Dolphin.exe" /link user32.lib shell32.lib /SUBSYSTEM:WINDOWS }
 Write-Host "Checking Paradox RUS disc: [$discRu]" -ForegroundColor Cyan
 if ($discRu -and (Test-Path -LiteralPath $discRu)) {
-    if ($discRu.ToLower().EndsWith(".cdi") -and -not (Get-Command chdman -ErrorAction SilentlyContinue)) {
+    if ($discRu.ToLower().EndsWith(".cdi") -and -not (Get-Command cdirip -ErrorAction SilentlyContinue)) {
         Write-Host "Fetching portable chdman.exe for .cdi extraction..." -ForegroundColor Cyan
         $chdDir = Join-Path $dcDir ".deps\chdman"
-        $chdExe = Join-Path $chdDir "chdman.exe"
+        $chdExe = Join-Path $chdDir "cdirip.exe"
         if (-not (Test-Path $chdExe)) {
             New-Item -ItemType Directory -Force -Path $chdDir | Out-Null
             $chdZip = "$env:TEMP\chdman_win64.zip"
