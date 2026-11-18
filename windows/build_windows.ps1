@@ -26,7 +26,7 @@ if (-not (Test-Path $dcDir)) {
 Push-Location $dcDir
 if (-not (Test-Path ".venv")) {
     python -m venv .venv
-    .\.venv\Scripts\pip install -e "engine/tools/dcdisc[test]" pillow pygame
+    .\.venv\Scripts\pip install -e "engine/tools/dcdisc[test]" pillow pygame pygame
 }
 $portLink = "ports\ecco-the-dolphin-defender-of-the-future-recomp"
 New-Item -ItemType Directory -Force -Path "ports" | Out-Null
