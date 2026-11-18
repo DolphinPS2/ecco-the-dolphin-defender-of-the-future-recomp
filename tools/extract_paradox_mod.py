@@ -24,7 +24,7 @@ def extract_cdi(disc_path, out_dir):
         while rem > 0:
             if is_dir:
                 pos = pvd_pos + (cur - 16) * sec_size
-            elif cur >= 200000:
+            elif cur >= 260000:
                 pos = -278651896 + cur * sec_size
             else:
                 pos = 4800680 + cur * sec_size
