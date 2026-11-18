@@ -101,7 +101,7 @@ class EccoLinuxInstaller(tk.Tk):
 
             self._set_progress(78, "Копирование европейского образа диска...")
             os.makedirs(os.path.join(out_dir, "disc"), exist_ok=True)
-            shutil.copy2(eu, os.path.join(out_dir, "disc", "ecco_eu" + os.path.splitext(eu)))
+            shutil.copy2(eu, os.path.join(out_dir, "disc", "ecco_eu" + os.path.splitext(eu)[1]))
 
             if ru and os.path.isfile(ru):
                 self._set_progress(85, "Распаковка русского перевода и озвучки Paradox RUS...")
