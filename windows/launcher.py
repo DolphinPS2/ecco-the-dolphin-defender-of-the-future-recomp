@@ -1,3 +1,4 @@
+import shutil
 #!/usr/bin/env python3
 import os, sys, time, math, shutil, subprocess, threading
 os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
@@ -9,8 +10,8 @@ MEDIA_DIR = os.path.join(BASE_DIR, "media")
 ENGINE_DIR = os.path.join(BASE_DIR, "engine")
 DISC_PATH = next((os.path.join(BASE_DIR, "disc", f) for f in os.listdir(os.path.join(BASE_DIR, "disc")) if f.startswith("ecco_eu.")), os.path.join(BASE_DIR, "disc", "ecco_eu.chd"))
 BIN_PATH = os.path.join(ENGINE_DIR, "ecco-the-dolphin-defender-of-the-future-recomp.exe")
-FFMPEG_BIN = os.path.join(BASE_DIR, "runtime", "ffmpeg.exe") if os.path.exists(os.path.join(BASE_DIR, "runtime", "ffmpeg.exe")) else "ffmpeg"
-FFPLAY_BIN = os.path.join(BASE_DIR, "runtime", "ffplay.exe") if os.path.exists(os.path.join(BASE_DIR, "runtime", "ffplay.exe")) else "ffplay"
+FFMPEG_BIN = os.path.join(BASE_DIR, "runtime", "ffmpeg.exe") if os.path.exists(os.path.join(BASE_DIR, "runtime", "ffmpeg.exe")) else shutil.which("ffmpeg")
+FFPLAY_BIN = os.path.join(BASE_DIR, "runtime", "ffplay.exe") if os.path.exists(os.path.join(BASE_DIR, "runtime", "ffplay.exe")) else shutil.which("ffplay")
 TOML_PATH = os.path.join(ENGINE_DIR, "ecco.toml")
 W, H, UI_FPS, VID_FPS = 2560, 1440, 60, 30
 
@@ -53,6 +54,7 @@ class GPUVideoStream:
     def _worker(self):
         if self.delay > 0: time.sleep(self.delay)
         if not self.running: return
+        if not FFMPEG_BIN or not os.path.exists(self.path): return
         cmd = [FFMPEG_BIN, "-loglevel", "quiet", "-stream_loop", "-1"] + (["-c:v", "libvpx-vp9"] if self.alpha else [])
         vf = f"scale={self.w}:{self.h}:flags=bilinear,fps={VID_FPS}" + (",unpremultiply=inplace=1" if self.alpha else "")
         cmd += ["-i", self.path, "-vf", vf, "-f", "rawvideo", "-pix_fmt", self.pix_fmt, "-"]
