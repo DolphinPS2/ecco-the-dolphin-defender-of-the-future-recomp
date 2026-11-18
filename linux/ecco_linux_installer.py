@@ -118,22 +118,35 @@ class EccoLinuxInstaller(tk.Tk):
             run_sh = os.path.join(out_dir, "Ecco_the_Dolphin.sh")
             with open(run_sh, "w", encoding="utf-8") as sf: sf.write(f"#!/usr/bin/env bash\ncd \"{out_dir}\"\nexec python3 \"{out_dir}/launcher.py\" \"$@\"\n")
             os.chmod(run_sh, 0o755)
-            ico = os.path.join(out_dir, "ecco_icon.png") if os.path.isfile(os.path.join(out_dir, "ecco_icon.png")) else os.path.join(out_dir, "ecco_icon.png")
-            de = f"[Desktop Entry]\nType=Application\nName=Ecco the Dolphin: Defender of the Future\nComment=Native PC Port (Europe & Paradox RUS)\nExec=\"{run_sh}\"\nIcon={ico}\nTerminal=false\nCategories=Game;AdventureGame;\n"
+            ico_src = os.path.join(out_dir, "ecco_icon.png")
+            ico_dir = os.path.expanduser("~/.local/share/icons/hicolor/256x256/apps")
+            os.makedirs(ico_dir, exist_ok=True)
+            ico_dst = os.path.join(ico_dir, "ecco-the-dolphin.png")
+            if os.path.isfile(ico_src): shutil.copy2(ico_src, ico_dst)
+            de = f"[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Ecco the Dolphin: Defender of the Future
+Comment=Native PC Port (Europe & Paradox RUS)
+Exec={run_sh}
+Icon=ecco-the-dolphin
+Path={out_dir}
+Terminal=false
+StartupNotify=true
+Categories=Game;AdventureGame;
+"
             if self.create_menu.get():
                 ad = os.path.expanduser("~/.local/share/applications"); os.makedirs(ad, exist_ok=True)
-                with open(os.path.join(ad, "ecco-the-dolphin.desktop"), "w", encoding="utf-8") as df: df.write(de)
+                mp = os.path.join(ad, "ecco-the-dolphin.desktop")
+                with open(mp, "w", encoding="utf-8") as df: df.write(de)
+                os.chmod(mp, 0o755)
+                subprocess.run(["update-desktop-database", ad], stderr=subprocess.DEVNULL)
             if self.create_desktop.get():
-                try:
-                    desk = subprocess.check_output(["xdg-user-dir", "DESKTOP"], text=True).strip()
-                except Exception:
-                    desk = subprocess.getoutput("xdg-user-dir DESKTOP").strip()
-                if desk and os.path.isdir(desk):
-                    dp = os.path.join(desk, "Ecco the Dolphin.desktop")
-                    with open(dp, "w", encoding="utf-8") as df: df.write(de)
-                    os.chmod(dp, 0o755); subprocess.run(["gio", "set", dp, "metadata::trusted", "true"], stderr=subprocess.DEVNULL)
-            subprocess.run(["kbuildsycoca6", "--noincremental"], check=False)
-            subprocess.run(["kbuildsycoca6", "--noincremental"], check=False)
+                dp = os.path.join(subprocess.getoutput("xdg-user-dir DESKTOP").strip() or os.path.expanduser("~/Desktop"), "Ecco the Dolphin.desktop")
+                with open(dp, "w", encoding="utf-8") as df: df.write(de)
+                os.chmod(dp, 0o755)
+                subprocess.run(["gio", "set", dp, "metadata::trusted", "true"], stderr=subprocess.DEVNULL)
+            subprocess.run(["gtk-update-icon-cache", "-f", "-t", os.path.expanduser("~/.local/share/icons/hicolor")], stderr=subprocess.DEVNULL)
             subprocess.run(["kbuildsycoca6", "--noincremental"], stderr=subprocess.DEVNULL)
             self._set_progress(100, "Готово!")
             self.after(0, lambda: (messagebox.showinfo("Готово", f"Игра успешно установлена в:\n{out_dir}"), self.destroy()))
