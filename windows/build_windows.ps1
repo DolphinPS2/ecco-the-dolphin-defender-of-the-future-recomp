@@ -53,7 +53,7 @@ cmake -S $portLink -B "$portLink\build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DCM
 $outDir = Join-Path $root "Ecco_the_Dolphin_Windows"
 New-Item -ItemType Directory -Force -Path "$outDir\engine", "$outDir\disc", "$outDir\runtime", "$outDir\profiles\europe\dreamcomp\ecco", "$outDir\profiles\paradox_rus\dreamcomp\ecco" | Out-Null
 
-# 1. Р В РІР‚СњР В Р вЂ Р В РЎвЂР В Р’В¶Р В РЎвЂўР В РЎвЂќ, DLL, Р В РЎвЂќР В РЎвЂўР В Р вЂ¦Р РЋРІР‚С›Р В РЎвЂР В РЎвЂ“Р В РЎвЂ Р В РЎвЂ Р В РЎвЂўР В Р’В±Р РЋР РЏР В Р’В·Р В Р’В°Р РЋРІР‚С™Р В Р’ВµР В Р’В»Р РЋР Р‰Р В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ extracted\fs\1ST_READ.BIN
+# 1. Р В Р’В Р Р†Р вЂљРЎСљР В Р’В Р В РІР‚В Р В Р’В Р РЋРІР‚ВР В Р’В Р вЂ™Р’В¶Р В Р’В Р РЋРІР‚СћР В Р’В Р РЋРІР‚Сњ, DLL, Р В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚СћР В Р’В Р В РІР‚В¦Р В Р Р‹Р Р†Р вЂљРЎвЂєР В Р’В Р РЋРІР‚ВР В Р’В Р РЋРІР‚вЂњР В Р’В Р РЋРІР‚В Р В Р’В Р РЋРІР‚В Р В Р’В Р РЋРІР‚СћР В Р’В Р вЂ™Р’В±Р В Р Р‹Р В Р РЏР В Р’В Р вЂ™Р’В·Р В Р’В Р вЂ™Р’В°Р В Р Р‹Р Р†Р вЂљРЎв„ўР В Р’В Р вЂ™Р’ВµР В Р’В Р вЂ™Р’В»Р В Р Р‹Р В Р вЂ°Р В Р’В Р В РІР‚В¦Р В Р Р‹Р Р†Р вЂљРІвЂћвЂ“Р В Р’В Р Р†РІР‚С›РІР‚вЂњ extracted\fs\1ST_READ.BIN
 Copy-Item "$portLink\build\game\ecco-the-dolphin-defender-of-the-future-recomp.exe" "$outDir\engine\" -Force
 Copy-Item ".deps\SDL3-*\lib\x64\SDL3.dll" "$outDir\engine\" -Force -ErrorAction SilentlyContinue
 Copy-Item ".deps\libchdr-build\chdr.dll" "$outDir\engine\" -Force -ErrorAction SilentlyContinue
@@ -62,21 +62,21 @@ if (Test-Path "$portLink\game\extracted") {
     Copy-Item "$portLink\game\extracted" "$outDir\engine\extracted" -Recurse -Force
 }
 
-# 2. Р В РЎвЂєР В Р’В±Р РЋР вЂљР В Р’В°Р В Р’В· Р В Р’ВµР В Р вЂ Р РЋР вЂљР В РЎвЂўР В РЎвЂ”Р В Р’ВµР В РІвЂћвЂ“Р РЋР С“Р В РЎвЂќР В РЎвЂўР В РЎвЂ“Р В РЎвЂў Р В РўвЂР В РЎвЂР РЋР С“Р В РЎвЂќР В Р’В°
-$discExt = [IO.Path]::GetExtension($discEu)
+# 2. Р В Р’В Р РЋРІР‚С”Р В Р’В Р вЂ™Р’В±Р В Р Р‹Р В РІР‚С™Р В Р’В Р вЂ™Р’В°Р В Р’В Р вЂ™Р’В· Р В Р’В Р вЂ™Р’ВµР В Р’В Р В РІР‚В Р В Р Р‹Р В РІР‚С™Р В Р’В Р РЋРІР‚СћР В Р’В Р РЋРІР‚вЂќР В Р’В Р вЂ™Р’ВµР В Р’В Р Р†РІР‚С›РІР‚вЂњР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚СћР В Р’В Р РЋРІР‚вЂњР В Р’В Р РЋРІР‚Сћ Р В Р’В Р СћРІР‚ВР В Р’В Р РЋРІР‚ВР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СњР В Р’В Р вЂ™Р’В°
+
 Copy-Item "$discEu" "$outDir\disc\ecco_eu$discExt" -Force
 
-# 3. Р В РЎС™Р В Р’ВµР В РўвЂР В РЎвЂР В Р’В°Р РЋРІР‚С›Р В Р’В°Р В РІвЂћвЂ“Р В Р’В»Р РЋРІР‚в„– 2K-Р В Р’В»Р В Р’В°Р РЋРЎвЂњР В Р вЂ¦Р РЋРІР‚РЋР В Р’ВµР РЋР вЂљР В Р’В°, Р РЋР С“Р В РЎвЂќР РЋР вЂљР В РЎвЂР В РЎвЂ”Р РЋРІР‚С™ Р В РЎвЂ Р В РЎвЂР В РЎвЂќР В РЎвЂўР В Р вЂ¦Р В РЎвЂќР В Р’В°
+# 3. Р В Р’В Р РЋРЎв„ўР В Р’В Р вЂ™Р’ВµР В Р’В Р СћРІР‚ВР В Р’В Р РЋРІР‚ВР В Р’В Р вЂ™Р’В°Р В Р Р‹Р Р†Р вЂљРЎвЂєР В Р’В Р вЂ™Р’В°Р В Р’В Р Р†РІР‚С›РІР‚вЂњР В Р’В Р вЂ™Р’В»Р В Р Р‹Р Р†Р вЂљРІвЂћвЂ“ 2K-Р В Р’В Р вЂ™Р’В»Р В Р’В Р вЂ™Р’В°Р В Р Р‹Р РЋРІР‚СљР В Р’В Р В РІР‚В¦Р В Р Р‹Р Р†Р вЂљР Р‹Р В Р’В Р вЂ™Р’ВµР В Р Р‹Р В РІР‚С™Р В Р’В Р вЂ™Р’В°, Р В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СњР В Р Р‹Р В РІР‚С™Р В Р’В Р РЋРІР‚ВР В Р’В Р РЋРІР‚вЂќР В Р Р‹Р Р†Р вЂљРЎв„ў Р В Р’В Р РЋРІР‚В Р В Р’В Р РЋРІР‚ВР В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚СћР В Р’В Р В РІР‚В¦Р В Р’В Р РЋРІР‚СњР В Р’В Р вЂ™Р’В°
 if (Test-Path "$portSrc\media") { Copy-Item "$portSrc\media" "$outDir\media" -Recurse -Force }
 Copy-Item "$PSScriptRoot\launcher.py" "$outDir\launcher.py" -Force
 Copy-Item "$PSScriptRoot\ecco.ico", "$PSScriptRoot\ecco_icon.png" "$outDir\engine\" -Force -ErrorAction SilentlyContinue
 
-# 4. Р В РЎСљР В Р’В°Р РЋРІР‚С™Р В РЎвЂР В Р вЂ Р В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ Ecco_the_Dolphin.exe Р РЋР С“ Р В РЎвЂР В РЎвЂќР В РЎвЂўР В Р вЂ¦Р В РЎвЂќР В РЎвЂўР В РІвЂћвЂ“ Р В РўвЂР В Р’ВµР В Р’В»Р РЋР Р‰Р РЋРІР‚С›Р В РЎвЂР В Р вЂ¦Р В Р’В°
+# 4. Р В Р’В Р РЋРЎС™Р В Р’В Р вЂ™Р’В°Р В Р Р‹Р Р†Р вЂљРЎв„ўР В Р’В Р РЋРІР‚ВР В Р’В Р В РІР‚В Р В Р’В Р В РІР‚В¦Р В Р Р‹Р Р†Р вЂљРІвЂћвЂ“Р В Р’В Р Р†РІР‚С›РІР‚вЂњ Ecco_the_Dolphin.exe Р В Р Р‹Р В РЎвЂњ Р В Р’В Р РЋРІР‚ВР В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚СћР В Р’В Р В РІР‚В¦Р В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚СћР В Р’В Р Р†РІР‚С›РІР‚вЂњ Р В Р’В Р СћРІР‚ВР В Р’В Р вЂ™Р’ВµР В Р’В Р вЂ™Р’В»Р В Р Р‹Р В Р вЂ°Р В Р Р‹Р Р†Р вЂљРЎвЂєР В Р’В Р РЋРІР‚ВР В Р’В Р В РІР‚В¦Р В Р’В Р вЂ™Р’В°
 [System.IO.File]::WriteAllText("$env:TEMP\ecco.rc", '1 ICON "ecco.ico"', [System.Text.Encoding]::ASCII)
 llvm-rc /I "$PSScriptRoot" /FO "$env:TEMP\ecco.res" "$env:TEMP\ecco.rc"
 clang-cl /O2 /EHsc "$PSScriptRoot\ecco_stub.cpp" "$env:TEMP\ecco.res" /Fe:"$outDir\Ecco_the_Dolphin.exe" /link user32.lib shell32.lib /SUBSYSTEM:WINDOWS
 
-# 5. Р В РЎвЂ™Р В Р вЂ Р РЋРІР‚С™Р В РЎвЂўР В Р вЂ¦Р В РЎвЂўР В РЎВР В Р вЂ¦Р РЋРІР‚в„–Р В РІвЂћвЂ“ runtime (ffmpeg/ffplay Р В РЎвЂР В Р’В· Р РЋР С“Р В РЎвЂР РЋР С“Р РЋРІР‚С™Р В Р’ВµР В РЎВР РЋРІР‚в„– Р В РЎвЂР В Р’В»Р В РЎвЂ Р В РЎвЂР В Р’В· Р РЋР С“Р В РЎвЂўР РЋР С“Р В Р’ВµР В РўвЂР В Р вЂ¦Р В Р’ВµР В РІвЂћвЂ“ Р РЋР РЉР РЋРІР‚С™Р В Р’В°Р В Р’В»Р В РЎвЂўР В Р вЂ¦Р В Р вЂ¦Р В РЎвЂўР В РІвЂћвЂ“ Р РЋР С“Р В Р’В±Р В РЎвЂўР РЋР вЂљР В РЎвЂќР В РЎвЂ)
+# 5. Р В Р’В Р РЋРІР‚в„ўР В Р’В Р В РІР‚В Р В Р Р‹Р Р†Р вЂљРЎв„ўР В Р’В Р РЋРІР‚СћР В Р’В Р В РІР‚В¦Р В Р’В Р РЋРІР‚СћР В Р’В Р РЋР’ВР В Р’В Р В РІР‚В¦Р В Р Р‹Р Р†Р вЂљРІвЂћвЂ“Р В Р’В Р Р†РІР‚С›РІР‚вЂњ runtime (ffmpeg/ffplay Р В Р’В Р РЋРІР‚ВР В Р’В Р вЂ™Р’В· Р В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚ВР В Р Р‹Р В РЎвЂњР В Р Р‹Р Р†Р вЂљРЎв„ўР В Р’В Р вЂ™Р’ВµР В Р’В Р РЋР’ВР В Р Р‹Р Р†Р вЂљРІвЂћвЂ“ Р В Р’В Р РЋРІР‚ВР В Р’В Р вЂ™Р’В»Р В Р’В Р РЋРІР‚В Р В Р’В Р РЋРІР‚ВР В Р’В Р вЂ™Р’В· Р В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СћР В Р Р‹Р В РЎвЂњР В Р’В Р вЂ™Р’ВµР В Р’В Р СћРІР‚ВР В Р’В Р В РІР‚В¦Р В Р’В Р вЂ™Р’ВµР В Р’В Р Р†РІР‚С›РІР‚вЂњ Р В Р Р‹Р В Р Р‰Р В Р Р‹Р Р†Р вЂљРЎв„ўР В Р’В Р вЂ™Р’В°Р В Р’В Р вЂ™Р’В»Р В Р’В Р РЋРІР‚СћР В Р’В Р В РІР‚В¦Р В Р’В Р В РІР‚В¦Р В Р’В Р РЋРІР‚СћР В Р’В Р Р†РІР‚С›РІР‚вЂњ Р В Р Р‹Р В РЎвЂњР В Р’В Р вЂ™Р’В±Р В Р’В Р РЋРІР‚СћР В Р Р‹Р В РІР‚С™Р В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚В)
 foreach ($tool in @("ffmpeg.exe", "ffplay.exe")) {
     $cmd = Get-Command $tool -ErrorAction SilentlyContinue
     if ($cmd) { Copy-Item $cmd.Source "$outDir\runtime\$tool" -Force }
@@ -92,12 +92,12 @@ if (-not (Test-Path "$outDir\runtime\ffmpeg.exe")) {
     }
 }
 
-# 6. Р В РІР‚ВР В Р’В°Р РЋРІР‚С™Р В Р вЂ¦Р В РЎвЂР В РЎвЂќР В РЎвЂ Р В Р’В·Р В Р’В°Р В РЎвЂ”Р РЋРЎвЂњР РЋР С“Р В РЎвЂќР В Р’В° (Р РЋРІР‚С™Р В РЎвЂўР РЋРІР‚РЋР В Р вЂ¦Р РЋРІР‚в„–Р В Р’Вµ Р В РЎвЂќР В РЎвЂўР В РЎвЂ”Р В РЎвЂР В РЎвЂ Р РЋР РЉР РЋРІР‚С™Р В Р’В°Р В Р’В»Р В РЎвЂўР В Р вЂ¦Р В Р’В°)
+# 6. Р В Р’В Р Р†Р вЂљР’ВР В Р’В Р вЂ™Р’В°Р В Р Р‹Р Р†Р вЂљРЎв„ўР В Р’В Р В РІР‚В¦Р В Р’В Р РЋРІР‚ВР В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚В Р В Р’В Р вЂ™Р’В·Р В Р’В Р вЂ™Р’В°Р В Р’В Р РЋРІР‚вЂќР В Р Р‹Р РЋРІР‚СљР В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СњР В Р’В Р вЂ™Р’В° (Р В Р Р‹Р Р†Р вЂљРЎв„ўР В Р’В Р РЋРІР‚СћР В Р Р‹Р Р†Р вЂљР Р‹Р В Р’В Р В РІР‚В¦Р В Р Р‹Р Р†Р вЂљРІвЂћвЂ“Р В Р’В Р вЂ™Р’Вµ Р В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚СћР В Р’В Р РЋРІР‚вЂќР В Р’В Р РЋРІР‚ВР В Р’В Р РЋРІР‚В Р В Р Р‹Р В Р Р‰Р В Р Р‹Р Р†Р вЂљРЎв„ўР В Р’В Р вЂ™Р’В°Р В Р’В Р вЂ™Р’В»Р В Р’В Р РЋРІР‚СћР В Р’В Р В РІР‚В¦Р В Р’В Р вЂ™Р’В°)
 Set-Content "$outDir\Start_Launcher.bat" "@echo off`r`ncd /d ""%~dp0""`r`nif exist ""runtime\pythonw.exe"" (start """" ""runtime\pythonw.exe"" ""launcher.py"") else if exist ""C:\EccoBuild\dreamcomp\.venv\Scripts\pythonw.exe"" (start """" ""C:\EccoBuild\dreamcomp\.venv\Scripts\pythonw.exe"" ""launcher.py"") else (start """" pythonw ""launcher.py"")" -Encoding ASCII
 Set-Content "$outDir\Play_Europe.bat" "@echo off`r`ncd /d ""%~dp0engine""`r`nset ""APPDATA=%~dp0profiles\europe""`r`necco-the-dolphin-defender-of-the-future-recomp.exe --config ""%~dp0engine\ecco.toml"" --disc ""%~dp0disc\ecco_eu$discExt"" --window" -Encoding ASCII
 Set-Content "$outDir\Play_Paradox_RUS.bat" "@echo off`r`ncd /d ""%~dp0engine""`r`nset ""APPDATA=%~dp0profiles\paradox_rus""`r`necco-the-dolphin-defender-of-the-future-recomp.exe --config ""%~dp0engine\ecco.toml"" --disc ""%~dp0disc\ecco_eu$discExt"" --window" -Encoding ASCII
 
-# 7. Р В Р’В Р В Р’В°Р РЋР С“Р В РЎвЂ”Р В Р’В°Р В РЎвЂќР В РЎвЂўР В Р вЂ Р В РЎвЂќР В Р’В° 131 Р РЋРІР‚С›Р В Р’В°Р В РІвЂћвЂ“Р В Р’В»Р В Р’В° Paradox RUS (96 + 35 SOUND) Р В РЎвЂ Р РЋР С“Р В РЎвЂўР В Р’В·Р В РўвЂР В Р’В°Р В Р вЂ¦Р В РЎвЂР В Р’Вµ settings.ini
+# 7. Р В Р’В Р вЂ™Р’В Р В Р’В Р вЂ™Р’В°Р В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚вЂќР В Р’В Р вЂ™Р’В°Р В Р’В Р РЋРІР‚СњР В Р’В Р РЋРІР‚СћР В Р’В Р В РІР‚В Р В Р’В Р РЋРІР‚СњР В Р’В Р вЂ™Р’В° 131 Р В Р Р‹Р Р†Р вЂљРЎвЂєР В Р’В Р вЂ™Р’В°Р В Р’В Р Р†РІР‚С›РІР‚вЂњР В Р’В Р вЂ™Р’В»Р В Р’В Р вЂ™Р’В° Paradox RUS (96 + 35 SOUND) Р В Р’В Р РЋРІР‚В Р В Р Р‹Р В РЎвЂњР В Р’В Р РЋРІР‚СћР В Р’В Р вЂ™Р’В·Р В Р’В Р СћРІР‚ВР В Р’В Р вЂ™Р’В°Р В Р’В Р В РІР‚В¦Р В Р’В Р РЋРІР‚ВР В Р’В Р вЂ™Р’Вµ settings.ini
 if ($discRu) {
     Write-Host "Extracting Paradox RUS translation & voiceover..." -ForegroundColor Cyan
     .\.venv\Scripts\python "$portSrc\tools\extract_paradox_mod.py" "$discRu" "$outDir\profiles\paradox_rus\dreamcomp\ecco\mods\rus_paradox"

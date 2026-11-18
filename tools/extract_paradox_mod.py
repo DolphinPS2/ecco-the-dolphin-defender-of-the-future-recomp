@@ -115,6 +115,9 @@ def extract_cdi(disc_path, out_dir):
     return count
 
 def extract_from_disc(disc_path, out_dir):
+    if not os.environ.get('DCDISC_LIBCHDR'):
+        for c in (os.path.join(os.getcwd(), '.deps', 'libchdr-build', 'chdr.dll'), os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'engine', 'chdr.dll')):
+            if os.path.exists(c): os.environ['DCDISC_LIBCHDR'] = os.path.abspath(c); break
     os.makedirs(out_dir, exist_ok=True)
     if disc_path.lower().endswith(".cdi"):
         count = extract_cdi(disc_path, out_dir)
