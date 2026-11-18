@@ -114,15 +114,21 @@ class EccoLinuxInstaller(tk.Tk):
             run_sh = os.path.join(out_dir, "Ecco_the_Dolphin.sh")
             with open(run_sh, "w", encoding="utf-8") as sf: sf.write(f"#!/usr/bin/env bash\ncd \"{out_dir}\"\nexec python3 \"{out_dir}/launcher.py\" \"$@\"\n")
             os.chmod(run_sh, 0o755)
-            ico = os.path.join(out_dir, "ecco.png")
-            de = f"[Desktop Entry]\nType=Application\nName=Ecco the Dolphin: Defender of the Future\nExec=\"{run_sh}\"\nIcon={ico}\nTerminal=false\nCategories=Game;\n"
+            ico = os.path.join(out_dir, "ecco_icon.png") if os.path.isfile(os.path.join(out_dir, "ecco_icon.png")) else os.path.join(out_dir, "ecco.png")
+            de = f"[Desktop Entry]\nType=Application\nName=Ecco the Dolphin: Defender of the Future\nComment=Native PC Port (Europe & Paradox RUS)\nExec=\"{run_sh}\"\nIcon={ico}\nTerminal=false\nCategories=Game;AdventureGame;\n"
             if self.create_menu.get():
                 ad = os.path.expanduser("~/.local/share/applications"); os.makedirs(ad, exist_ok=True)
                 with open(os.path.join(ad, "ecco-the-dolphin.desktop"), "w", encoding="utf-8") as df: df.write(de)
-            if self.create_desktop.get() and os.path.isdir(os.path.expanduser("~/Desktop")):
-                dp = os.path.expanduser("~/Desktop/Ecco the Dolphin.desktop")
-                with open(dp, "w", encoding="utf-8") as df: df.write(de)
-                os.chmod(dp, 0o755)
+            if self.create_desktop.get():
+                try:
+                    desk = subprocess.check_output(["xdg-user-dir", "DESKTOP"], text=True).strip()
+                except Exception:
+                    desk = os.path.expanduser("~/Desktop")
+                if desk and os.path.isdir(desk):
+                    dp = os.path.join(desk, "Ecco the Dolphin.desktop")
+                    with open(dp, "w", encoding="utf-8") as df: df.write(de)
+                    os.chmod(dp, 0o755)
+            subprocess.run(["kbuildsycoca6", "--noincremental"], check=False)
             self._set_progress(100, "Готово!")
             self.after(0, lambda: (messagebox.showinfo("Готово", f"Игра успешно установлена в:\n{out_dir}"), self.destroy()))
         except Exception as exc:
