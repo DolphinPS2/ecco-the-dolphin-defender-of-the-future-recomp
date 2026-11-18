@@ -38,6 +38,23 @@ Copy-Item "$PSScriptRoot\launcher.py" "$outDir\launcher.py" -Force
 $ico = if (Test-Path -LiteralPath "$outDir\ecco.ico") { "$outDir\ecco.ico" } else { "$outDir\engine\ecco.ico" }
 if (Test-Path -LiteralPath $ico) { $icoEsc = $ico.Replace("\", "\\"); "1 ICON `"$icoEsc`"" | Set-Content "$env:TEMP\ecco.rc" -Encoding ASCII; rc.exe /fo "$env:TEMP\ecco.res" "$env:TEMP\ecco.rc"; clang-cl /O2 /EHsc "$PSScriptRoot\ecco_stub.cpp" "$env:TEMP\ecco.res" /Fe:"$outDir\Ecco_the_Dolphin.exe" /link user32.lib shell32.lib /SUBSYSTEM:WINDOWS }
 Write-Host "Checking Paradox RUS disc: [$discRu]" -ForegroundColor Cyan
-if ($discRu -and (Test-Path -LiteralPath $discRu)) { Write-Host "Extracting Paradox RUS translation & voiceover..." -ForegroundColor Cyan; .\.venv\Scripts\python "$portSrc\tools\extract_paradox_mod.py" "$discRu" "$outDir\profiles\paradox_rus\dreamcomp\ecco\mods\rus_paradox" } else { Write-Host "Skipped Paradox RUS disc (Europe only)." -ForegroundColor Yellow }
+if ($discRu -and (Test-Path -LiteralPath $discRu)) {
+    if ($discRu.ToLower().EndsWith(".cdi") -and -not (Get-Command chdman -ErrorAction SilentlyContinue)) {
+        Write-Host "Fetching portable chdman.exe for .cdi extraction..." -ForegroundColor Cyan
+        $chdDir = Join-Path $dcDir ".deps\chdman"
+        $chdExe = Join-Path $chdDir "chdman.exe"
+        if (-not (Test-Path $chdExe)) {
+            New-Item -ItemType Directory -Force -Path $chdDir | Out-Null
+            $chdZip = "$env:TEMP\chdman_win64.zip"
+            Invoke-WebRequest -Uri "https://github.com" -OutFile $chdZip
+            Expand-Archive -Path $chdZip -DestinationPath $chdDir -Force
+            $found = Get-ChildItem $chdDir -Recurse -Filter "chdman.exe" | Select-Object -First 1
+            if ($found -and $found.FullName -ne $chdExe) { Copy-Item $found.FullName $chdExe -Force }
+        }
+        $env:Path = "$chdDir;$env:Path"
+    }
+    Write-Host "Extracting Paradox RUS translation & voiceover..." -ForegroundColor Cyan
+    .\.venv\Scripts\python "$portSrc\tools\extract_paradox_mod.py" "$discRu" "$outDir\profiles\paradox_rus\dreamcomp\ecco\mods\rus_paradox"
+} else { Write-Host "Skipped Paradox RUS disc (Europe only)." -ForegroundColor Yellow }
 Pop-Location
 Write-Host "=== Build complete! Output folder: $outDir ===" -ForegroundColor Green
