@@ -46,7 +46,7 @@ if ($discRu -and (Test-Path -LiteralPath $discRu)) {
         if (-not (Test-Path $chdExe)) {
             New-Item -ItemType Directory -Force -Path $chdDir | Out-Null
             $chdZip = "$env:TEMP\chdman_win64.zip"
-            Invoke-WebRequest -Uri "https://github.com" -OutFile $chdZip
+            Invoke-WebRequest -Uri "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/chdman_win64.zip" -OutFile $chdZip
             Expand-Archive -Path $chdZip -DestinationPath $chdDir -Force
             $found = Get-ChildItem $chdDir -Recurse -Filter "chdman.exe" | Select-Object -First 1
             if ($found -and $found.FullName -ne $chdExe) { Copy-Item $found.FullName $chdExe -Force }
