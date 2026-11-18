@@ -1,3 +1,7 @@
+param(
+    [string]$DiscEu = "",
+    [string]$DiscRu = ""
+)
 $ErrorActionPreference = "Stop"
 $env:PYTHONUTF8 = "1"
 Write-Host "=== Ecco the Dolphin: Automated Windows x64 Build ===" -ForegroundColor Cyan
