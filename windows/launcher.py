@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 import os, sys, time, math, shutil, subprocess, threading
 os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
 import pygame
@@ -7,7 +7,7 @@ from pygame._sdl2.video import Window, Renderer, Texture
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 MEDIA_DIR = os.path.join(BASE_DIR, "media")
 ENGINE_DIR = os.path.join(BASE_DIR, "engine")
-DISC_PATH = os.path.join(BASE_DIR, "disc", "ecco_eu.chd")
+DISC_PATH = next((os.path.join(BASE_DIR, "disc", f) for f in os.listdir(os.path.join(BASE_DIR, "disc")) if f.startswith("ecco_eu.")), os.path.join(BASE_DIR, "disc", "ecco_eu.chd"))
 BIN_PATH = os.path.join(ENGINE_DIR, "ecco-the-dolphin-defender-of-the-future-recomp.exe")
 FFMPEG_BIN = os.path.join(BASE_DIR, "runtime", "ffmpeg.exe") if os.path.exists(os.path.join(BASE_DIR, "runtime", "ffmpeg.exe")) else "ffmpeg"
 FFPLAY_BIN = os.path.join(BASE_DIR, "runtime", "ffplay.exe") if os.path.exists(os.path.join(BASE_DIR, "runtime", "ffplay.exe")) else "ffplay"
@@ -18,11 +18,22 @@ def setup_portable_env(choice_name):
     return os.path.join(BASE_DIR, "profiles", choice_name)
 
 def run_engine(choice):
-    prof_dir = setup_portable_env("europe" if choice == 0 else "paradox_rus")
+    prof_name = "europe" if choice == 0 else "paradox_rus"
+    prof_dir = setup_portable_env(prof_name)
     os.chdir(ENGINE_DIR)
     env = os.environ.copy()
-    env["APPDATA"] = prof_dir
-    subprocess.Popen([BIN_PATH, "--config", TOML_PATH, "--disc", DISC_PATH, "--window", "--fullscreen", "--widescreen", "--scale", "3", "--interpolate-auto", "--soft-clip", "--present-path", "dxgi"], env=env, creationflags=subprocess.DETACHED_PROCESS)
+    if os.name == "nt":
+        env["APPDATA"] = prof_dir
+    else:
+        env["XDG_CONFIG_HOME"] = prof_dir
+    cmd = [BIN_PATH, "--config", TOML_PATH, "--disc", DISC_PATH, "--window", "--fullscreen", "--widescreen", "--scale", "3", "--interpolate-auto", "--soft-clip"]
+    if os.name == "nt":
+        cmd += ["--present-path", "dxgi"]
+    mod_dir = os.path.join(prof_dir, "dreamcomp", "ecco", "mods", "rus_paradox")
+    if choice == 1 and os.path.isdir(mod_dir):
+        cmd += ["--mod", mod_dir]
+    kw = {"creationflags": subprocess.DETACHED_PROCESS} if os.name == "nt" else {}
+    subprocess.Popen(cmd, env=env, **kw)
     time.sleep(0.5)
     pygame.quit()
     sys.exit(0)
