@@ -1,0 +1,100 @@
+﻿name: Build Windows & Linux Engine
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout port
+        uses: actions/checkout@v4
+        with:
+          path: port
+
+      - name: Checkout dreamcomp (linux-ecco)
+        uses: actions/checkout@v4
+        with:
+          repository: cherryduck/dreamcomp
+          ref: linux-ecco
+          submodules: recursive
+          path: dreamcomp
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Python deps & SDL3
+        working-directory: dreamcomp
+        run: |
+          python -m pip install -e "engine/tools/dcdisc[test]" pillow
+          python tools/dc.py deps
+
+      - name: Configure & Build libchdr + Engine (MSVC / clang-cl)
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+        env:
+          PYTHONUTF8: "1"
+        run: |
+          cmake -S dreamcomp/engine/third_party/libchdr -B dreamcomp/.deps/libchdr-build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
+          cmake --build dreamcomp/.deps/libchdr-build
+          cmake -S port -B build-win -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DDREAMCOMP_DIR="${{ github.workspace }}/dreamcomp" -DDREAMCOMP_FRONTEND=OFF
+          cmake --build build-win
+
+      - name: Package Windows Engine Artifact
+        run: |
+          mkdir -p dist-win/engine
+          cp build-win/game/ecco-the-dolphin-defender-of-the-future-recomp.exe dist-win/engine/
+          cp dreamcomp/.deps/SDL3-*/lib/x64/SDL3.dll dist-win/engine/
+          cp dreamcomp/.deps/libchdr-build/chdr.dll dist-win/engine/
+          cp port/game/ecco.toml port/game/hud_overrides.ini dist-win/engine/ 2>/dev/null || true
+          cp port/windows/launcher.py dist-win/
+
+      - name: Upload Windows Engine
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ecco-Engine-Windows-x64
+          path: dist-win/
+
+  build-linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Linux dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build g++ libvulkan-dev glslang-tools libsdl3-dev libchdr-dev python3-venv
+
+      - name: Checkout port
+        uses: actions/checkout@v4
+        with:
+          path: port
+
+      - name: Checkout dreamcomp (linux-ecco)
+        uses: actions/checkout@v4
+        with:
+          repository: cherryduck/dreamcomp
+          ref: linux-ecco
+          submodules: recursive
+          path: dreamcomp
+
+      - name: Configure & Build Engine (Linux x64)
+        run: |
+          cmake -S port -B build-linux -G Ninja -DCMAKE_BUILD_TYPE=Release -DDREAMCOMP_DIR="${{ github.workspace }}/dreamcomp" -DDREAMCOMP_FRONTEND=OFF
+          cmake --build build-linux
+
+      - name: Package Linux Engine Artifact
+        run: |
+          mkdir -p dist-linux/engine
+          cp build-linux/game/ecco-the-dolphin-defender-of-the-future-recomp dist-linux/engine/
+          cp port/game/ecco.toml port/game/hud_overrides.ini dist-linux/engine/ 2>/dev/null || true
+          cp port/windows/launcher.py dist-linux/
+
+      - name: Upload Linux Engine
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ecco-Engine-Linux-x64
+          path: dist-linux/
