@@ -35,7 +35,7 @@ $z = "$env:TEMP\ecco_launcher.zip"
 Invoke-WebRequest -Uri "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_DC_PC_Launcher_Win_Linux.zip" -OutFile $z
 Expand-Archive -Path $z -DestinationPath $outDir -Force
 Copy-Item "$PSScriptRoot\launcher.py" "$outDir\launcher.py" -Force
-$ico = "$outDir\engine\ecco.ico"
+$ico = if (Test-Path -LiteralPath "$outDir\ecco.ico") { "$outDir\ecco.ico" } else { "$outDir\engine\ecco.ico" }
 if (Test-Path -LiteralPath $ico) { $icoEsc = $ico.Replace("\", "\\"); "1 ICON `"$icoEsc`"" | Set-Content "$env:TEMP\ecco.rc" -Encoding ASCII; rc.exe /fo "$env:TEMP\ecco.res" "$env:TEMP\ecco.rc"; clang-cl /O2 /EHsc "$PSScriptRoot\ecco_stub.cpp" "$env:TEMP\ecco.res" /Fe:"$outDir\Ecco_the_Dolphin.exe" /link user32.lib shell32.lib /SUBSYSTEM:WINDOWS }
 Write-Host "Checking Paradox RUS disc: [$discRu]" -ForegroundColor Cyan
 if ($discRu -and (Test-Path -LiteralPath $discRu)) { Write-Host "Extracting Paradox RUS translation & voiceover..." -ForegroundColor Cyan; .\.venv\Scripts\python "$portSrc\tools\extract_paradox_mod.py" "$discRu" "$outDir\profiles\paradox_rus\dreamcomp\ecco\mods\rus_paradox" } else { Write-Host "Skipped Paradox RUS disc (Europe only)." -ForegroundColor Yellow }
