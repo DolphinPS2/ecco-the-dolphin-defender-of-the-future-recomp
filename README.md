@@ -36,6 +36,10 @@ recompiled code against the engine's SH-4 interpreter.
 - Saves to a per-user virtual memory card; rumble; keyboard and gamepad, rebindable in game
 - Texture dumping and replacement packs, file mods (dreamcomp `docs/TEXTURE-PACKS.md`, `docs/MODS.md`)
 
+## Windows Installer (Recommended)
+
+Download **[Ecco_the_Dolphin_Online_Setup.exe](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_Online_Setup.exe)** to install the native PC port with desktop/Start Menu/taskbar shortcuts and automatic disc & Paradox Russian mod setup.
+
 ## One-Click Automated Build (Windows & Linux)
 
 1. Place your **Europe** disc image (.chd / .cue / .gdi) and optionally your **Paradox Russian** disc image (.cdi / .chd / .gdi) on disk.

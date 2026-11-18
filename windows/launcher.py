@@ -1,3 +1,8 @@
+import ctypes, os, sys
+try:
+    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('DolphinPS2.EccoDefender.Launcher')
+except Exception:
+    pass
 #!/usr/bin/env python3
 import os, sys, time, math, shutil, subprocess, threading
 os.environ["SDL_JOYSTICK_ALLOW_BACKGROUND_EVENTS"] = "1"
