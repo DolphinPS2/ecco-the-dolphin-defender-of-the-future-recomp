@@ -36,10 +36,18 @@ recompiled code against the engine's SH-4 interpreter.
 - Saves to a per-user virtual memory card; rumble; keyboard and gamepad, rebindable in game
 - Texture dumping and replacement packs, file mods (dreamcomp `docs/TEXTURE-PACKS.md`, `docs/MODS.md`)
 
-## Windows Installer (Recommended)
+## Windows Installer & Dual-Version DC PC Launcher (Recommended)
 
-Download **[Ecco_the_Dolphin_Online_Setup.exe](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_Online_Setup.exe)** to install the native PC port with desktop/Start Menu/taskbar shortcuts and automatic disc & Paradox Russian mod setup.
+Download **[Ecco_the_Dolphin_Online_Setup.exe](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_Online_Setup.exe)** — a full Windows installer for this native Dreamcast-to-PC static recompilation port, featuring an interactive **DC PC Graphical Launcher** with support for two isolated game editions:
 
+- **Europe Original (MK-5103350, En / Fr / De / Es)** — authentic European Dreamcast release with widescreen (up to 21:9), up to 8x internal resolution, and high refresh rate interpolation.
+- **Paradox Russian Edition (Paradox RUS — Full Russian Text & Voiceover)** — automatically extracted from your Paradox .cdi / .chd / .gdi disc image during setup, with isolated settings and virtual memory card (VMU) saves so both editions coexist without conflicts.
+
+### Установка на Windows (на русском языке)
+1. Скачайте и запустите **[Ecco_the_Dolphin_Online_Setup.exe](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_Online_Setup.exe)**.
+2. Выберите папку установки и ярлыки (Рабочий стол, меню «Пуск», Панель задач).
+3. Укажите ваши образы дисков Dreamcast: обязательный европейский (**Europe** .chd/.cue/.gdi) и по желанию русский от **Paradox** (.cdi/.chd/.gdi).
+4. Установщик автоматически загрузит скомпилированный движок, распакует русский перевод и озвучку и настроит графический лаунчер для запуска обеих версий.
 ## One-Click Automated Build (Windows & Linux)
 
 1. Place your **Europe** disc image (.chd / .cue / .gdi) and optionally your **Paradox Russian** disc image (.cdi / .chd / .gdi) on disk.
