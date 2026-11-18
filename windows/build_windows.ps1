@@ -31,8 +31,9 @@ Copy-Item ".deps\SDL3-*\lib\x64\SDL3.dll" "$outDir\engine\" -Force -ErrorAction 
 Copy-Item ".deps\libchdr-build\chdr.dll" "$outDir\engine\" -Force -ErrorAction SilentlyContinue
 Copy-Item "$portLink\game\ecco.toml", "$portLink\game\hud_overrides.ini" "$outDir\engine\" -Force -ErrorAction SilentlyContinue
 Copy-Item -LiteralPath $discEu -Destination "$outDir\disc\ecco_eu$([IO.Path]::GetExtension($discEu))" -Force
-$ProgressPreference = "SilentlyContinue"; $ProgressPreference = "SilentlyContinue"; $z = "$env:TEMP\ecco_launcher.zip"
-Invoke-WebRequest -Uri "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_DC_PC_Launcher_Win_Linux.zip" -OutFile $z
+$ProgressPreference = "SilentlyContinue"; Write-Host "Downloading DC PC Launcher (83 MB)..." -ForegroundColor Cyan
+$z = "$env:TEMP\ecco_launcher.zip"
+curl.exe -L -# "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_DC_PC_Launcher_Win_Linux.zip" -o $z
 Expand-Archive -Path $z -DestinationPath $outDir -Force
 Copy-Item "$PSScriptRoot\launcher.py" "$outDir\launcher.py" -Force
 $ico = if (Test-Path -LiteralPath "$outDir\ecco.ico") { "$outDir\ecco.ico" } else { "$outDir\engine\ecco.ico" }
@@ -46,7 +47,7 @@ if ($discRu -and (Test-Path -LiteralPath $discRu)) {
         if (-not (Test-Path $chdExe)) {
             New-Item -ItemType Directory -Force -Path $chdDir | Out-Null
             $chdZip = "$env:TEMP\chdman_win64.zip"
-            Invoke-WebRequest -Uri "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/chdman_win64.zip" -OutFile $chdZip
+            curl.exe -L -# "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/chdman_win64.zip" -o $chdZip
             Expand-Archive -Path $chdZip -DestinationPath $chdDir -Force
             $found = Get-ChildItem $chdDir -Recurse -Filter "cdirip.exe" | Select-Object -First 1
             if ($found -and $found.FullName -ne $chdExe) { Copy-Item $found.FullName $chdExe -Force }
