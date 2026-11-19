@@ -1,0 +1,21 @@
+name: Test Windows Installer
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag (e.g. v1.2)
+        required: true
+        default: v1.2
+jobs:
+  test-setup:
+    runs-on: windows-latest
+    steps:
+      - name: Download Setup and verify
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path C:\test_in | Out-Null
+          gh release download ${{ github.event.inputs.tag }} -p "Ecco_the_Dolphin_Online_Setup.exe" -D C:\test_in -R ${{ github.repository }}
+          Get-Item C:\test_in\Ecco_the_Dolphin_Online_Setup.exe | Select-Object Name, Length
+          Get-FileHash C:\test_in\Ecco_the_Dolphin_Online_Setup.exe -Algorithm SHA256
+        env:
+          GH_TOKEN: ${{ github.token }}
