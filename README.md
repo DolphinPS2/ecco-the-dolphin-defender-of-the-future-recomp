@@ -1,4 +1,8 @@
 # Ecco the Dolphin: Defender of the Future: Recompiled (Dreamcast)
+<p align="center">
+  <img src="docs/art/box_art.png" alt="Ecco Box Art" width="460" />&nbsp;&nbsp;
+  <img src="docs/art/disc_label.png" alt="Ecco Disc Label" width="260" />
+</p>
 
 A native PC port of **Ecco the Dolphin: Defender of the Future** (Dreamcast, Europe, Appaloosa
 Interactive / Sega 2000), built with [dreamcomp](https://github.com/cherryduck/dreamcomp/tree/linux-ecco).
