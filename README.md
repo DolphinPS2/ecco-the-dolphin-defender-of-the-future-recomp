@@ -4,6 +4,12 @@
   <img src="docs/art/disc_label.png" alt="Ecco Disc Label" width="260" />
 </p>
 
+<p align="center">
+  <a href="https://github.com"><img src="https://shields.io" alt="Download Windows"/></a>
+  <a href="https://github.com"><img src="https://shields.io" alt="Download Linux"/></a>
+  <a href="https://github.com"><img src="https://shields.io" alt="Releases"/></a>
+</p>
+
 A native PC port of **Ecco the Dolphin: Defender of the Future** (Dreamcast, Europe, Appaloosa
 Interactive / Sega 2000), built with [dreamcomp](https://github.com/cherryduck/dreamcomp/tree/linux-ecco).
 The game's SH-4 code is statically recompiled to C++ ahead of time, and the Dreamcast's graphics,
@@ -158,3 +164,9 @@ Developed with AI assistance (Claude), following dreamcomp's workflow; see dream
 GPL-2.0.
 
 
+
+---
+### Поисковые теги / Search Keywords
+**Русский:** Экко Дельфин: Защитник Будущего на ПК (Windows / Linux / Steam Deck) — нативный порт версии SEGA Dreamcast (не эмулятор). Включает европейскую версию (Europe MK-5103350) и русскую версию с полной озвучкой и переводом Paradox (Paradox RUS), поддержку широкоформатных экранов 16:9 и 21:9, высокое разрешение и 60+ FPS.
+
+**English:** Ecco the Dolphin: Defender of the Future Native PC Port for Windows 10/11, Linux, and Steam Deck (SEGA Dreamcast static recompilation via dreamcomp). Supports Europe Original edition (MK-5103350) and Paradox Russian edition (Paradox RUS) with graphical launcher, widescreen 21:9, and high refresh rate.
