@@ -1,0 +1,387 @@
+diff --git a/src/frontend/menu_ui.cpp b/src/frontend/menu_ui.cpp
+index 6de406a..0a2b9b1 100644
+--- a/src/frontend/menu_ui.cpp
++++ b/src/frontend/menu_ui.cpp
+@@ -10,6 +10,38 @@
+ #include <cstring>
+ #include <fstream>
+ #include <sstream>
++#include <unordered_map>
++
++namespace {
++std::string tr_lookup(const std::string& text, const std::filesystem::path* init_dir = nullptr) {
++    static bool loaded = false;
++    static bool enabled = false;
++    static std::unordered_map<std::string, std::string> dict;
++    if (init_dir && !loaded) {
++        loaded = true;
++        const char* lang = std::getenv("DREAMCOMP_LANG");
++        const char* appd = std::getenv("APPDATA"); if ((lang && std::string(lang) == "ru") || (appd && std::string(appd).find("paradox_rus") != std::string::npos)) {
++            enabled = true;
++            std::ifstream in(*init_dir / "frontend" / "lang_ru.ini", std::ios::binary);
++            std::string line;
++            bool first = true;
++            while (std::getline(in, line)) {
++                if (first && line.size() >= 3 && (unsigned char)line[0] == 0xEF && (unsigned char)line[1] == 0xBB && (unsigned char)line[2] == 0xBF)
++                    line.erase(0, 3);
++                first = false;
++                if (!line.empty() && line.back() == '\r') line.pop_back();
++                auto eq = line.find('=');
++                if (eq != std::string::npos && eq > 0)
++                    dict[line.substr(0, eq)] = line.substr(eq + 1);
++            }
++        }
++    }
++    if (!enabled || text.empty()) return text;
++    auto it = dict.find(text);
++    return it != dict.end() ? it->second : text;
++}
++} // namespace
++
+ 
+ #include "RmlUi_Platform_SDL.h"
+ #include "dream/render/vk/window.h"
+@@ -336,6 +368,7 @@ std::string MenuUi::title() const {
+ 
+ bool MenuUi::load(Rml::Context* ctx, std::string* error) {
+     ctx_ = ctx;
++    tr_lookup("", &cfg_.exe_dir);
+     const auto fe = cfg_.exe_dir / "frontend";
+     std::string rml;
+     {
+@@ -499,9 +532,9 @@ bool MenuUi::playable() const { return !verifying_ && disc_playable(disc_) && ga
+ // ---- rows -------------------------------------------------------------------------------------------
+ 
+ std::string MenuUi::name_html(const std::string& key, const std::string& name, bool live) const {
+-    std::string s = esc(name);
++    std::string s = esc(tr_lookup(name));
+     if (mode_ == Mode::InGame && !live)
+-        s += "<span class=\"badge\">Next start</span>";
++        s += "<span class=\"badge\">" + tr_lookup("Next start") + "</span>";
+     (void)key;
+     return s;
+ }
+@@ -509,7 +542,7 @@ std::string MenuUi::name_html(const std::string& key, const std::string& name, b
+ std::string MenuUi::row_cycle(const std::string& key, const std::string& name,
+                               const std::string& value, const std::string& help, bool live) {
+     const std::string id = "r-" + key;
+-    descs_[id] = {name, help, live};
++    std::string dh = tr_lookup("desc_" + key); descs_[id] = {tr_lookup(name), dh == "desc_" + key ? tr_lookup(help) : dh, live};
+     return "<div id=\"" + id + "\" class=\"prow focusable" + (draft_.pending(key) ? " pending" : "") +
+            "\" act=\"cycle:" + key + "\"><div class=\"plabel\">" + name_html(key, name, live) +
+            "</div><div class=\"pvalue\"><span class=\"chev\" act=\"prev:" + key +
+@@ -521,10 +554,10 @@ std::string MenuUi::row_cycle(const std::string& key, const std::string& name,
+ std::string MenuUi::row_toggle(const std::string& key, const std::string& name, bool on,
+                                const std::string& help, bool live) {
+     const std::string id = "r-" + key;
+-    descs_[id] = {name, help, live};
++    std::string dh = tr_lookup("desc_" + key); descs_[id] = {tr_lookup(name), dh == "desc_" + key ? tr_lookup(help) : dh, live};
+     return "<div id=\"" + id + "\" class=\"prow focusable" + (draft_.pending(key) ? " pending" : "") +
+            "\" act=\"toggle:" + key + "\"><div class=\"plabel\">" + name_html(key, name, live) +
+-           "</div><div class=\"pvalue\"><span class=\"switch-label\">" + (on ? "On" : "Off") +
++           "</div><div class=\"pvalue\"><span class=\"switch-label\">" + tr_lookup(on ? "On" : "Off") +
+            "</span><span class=\"switch" + (on ? " on" : "") +
+            "\"><span class=\"knob\"></span></span></div><span class=\"pend\"></span></div>";
+ }
+@@ -534,7 +567,7 @@ std::string MenuUi::row_radio(const std::string& key, const std::string& name,
+                               const std::string& help, bool live,
+                               const std::vector<bool>& enabled) {
+     const std::string id = "r-" + key;
+-    descs_[id] = {name, help, live};
++    std::string dh = tr_lookup("desc_" + key); descs_[id] = {tr_lookup(name), dh == "desc_" + key ? tr_lookup(help) : dh, live};
+     std::string r = "<div id=\"" + id + "\" class=\"orow" +
+                     (draft_.pending(key) ? " pending" : "") + "\"><div class=\"oname\">" +
+                     name_html(key, name, live) + "<span class=\"pend\"></span></div><div "
+@@ -545,7 +578,7 @@ std::string MenuUi::row_radio(const std::string& key, const std::string& name,
+         r += "<div id=\"o-" + key + "-" + id_safe(choices[i].value) + "\" class=\"opt" +
+              (sel ? " sel" : "") + (on ? " focusable" : " off") + "\" act=\"" +
+              (on ? "set:" + key + "=" + choices[i].value : std::string()) + "\">" +
+-             esc(choices[i].label) + "</div>";
++             esc(tr_lookup(choices[i].label)) + "</div>";
+     }
+     return r + "</div></div>";
+ }
+@@ -568,25 +601,25 @@ void MenuUi::select(const std::string& key, const std::string& value) {
+ std::string MenuUi::row_slider(const std::string& key, const std::string& name, int percent,
+                                const std::string& help, bool live) {
+     const std::string id = "r-" + key;
+-    descs_[id] = {name, help, live};
++    std::string dh = tr_lookup("desc_" + key); descs_[id] = {tr_lookup(name), dh == "desc_" + key ? tr_lookup(help) : dh, live};
+     return "<div id=\"" + id + "\" class=\"prow focusable" + (draft_.pending(key) ? " pending" : "") +
+            "\" act=\"slider:" + key + "\"><div class=\"plabel\">" + name_html(key, name, live) +
+            "</div><div class=\"pvalue\"><div class=\"slider\" id=\"" + key +
+            "-slider\"><div class=\"track\"><div class=\"fill\" style=\"width: " +
+            std::to_string(percent) + "%;\"></div></div></div><span class=\"slider-val\">" +
+-           (percent == 0 ? std::string("Off") : std::to_string(percent) + " %") +
++           (percent == 0 ? tr_lookup("Off") : std::to_string(percent) + " %") +
+            "</span></div><span class=\"pend\"></span></div>";
+ }
+ 
+ std::string MenuUi::row_button(const std::string& id, const std::string& act,
+                                const std::string& name, const std::string& button,
+                                const std::string& help, bool enabled) {
+-    descs_[id] = {name, help, true};
++    std::string dh = tr_lookup("desc_" + id); descs_[id] = {tr_lookup(name), dh == "desc_" + id ? tr_lookup(help) : dh, true};
+     std::string r = "<div id=\"" + id + "\" class=\"prow" + (enabled ? " focusable" : " dim") +
+                     "\" act=\"" + (enabled ? act : std::string()) + "\"><div class=\"plabel\">" +
+-                    esc(name) + "</div>";
++                    esc(tr_lookup(name)) + "</div>";
+     if (!button.empty())
+-        r += "<div class=\"pvalue\"><span class=\"inline-button\">" + esc(button) + "</span></div>";
++        r += "<div class=\"pvalue\"><span class=\"inline-button\">" + esc(tr_lookup(button)) + "</span></div>";
+     r += "<span class=\"pend\"></span></div>";
+     return r;
+ }
+@@ -629,7 +662,7 @@ std::string MenuUi::page_launcher() const {
+     s += "<div id=\"l-controls\" class=\"litem focusable\" act=\"panel:controls\">Controls</div>";
+     s += "<div id=\"l-settings\" class=\"litem focusable\" act=\"panel:general\">Settings</div>";
+     s += "<div id=\"l-mods\" class=\"litem focusable\" act=\"panel:mods\">Mods</div>";
+-    s += "<div id=\"l-quit\" class=\"litem focusable\" act=\"exit\">Quit</div></div>";
++    s += "<div id=\"l-quit\" class=\"litem focusable\" act=\"exit\">" + tr_lookup("Quit") + "</div></div>";
+ 
+     // The disc, discreetly, under the list.
+     std::string cls, text;
+@@ -661,9 +694,9 @@ std::string MenuUi::page_launcher() const {
+     s += "<div id=\"version\">" + esc(cfg_.version) + "</div>";
+     s += "<div id=\"l-hints\">";
+     if (has_pad())
+-        s += glyph(glyph_a()) + hint("Select");
++        s += glyph(glyph_a()) + hint(tr_lookup("Select"));
+     else
+-        s += glyph(kGlyphEnter) + hint("Select");
++        s += glyph(kGlyphEnter) + hint(tr_lookup("Select"));
+     s += "</div>";
+     return s;
+ }
+@@ -710,12 +743,12 @@ std::string MenuUi::controls_cards() {
+         const bool usable = p == 0 || pad;
+         std::string icon = utf8(pad || p > 0 ? kDeviceGamepad : kDeviceKeyboard);
+         std::string dev = p < pads_.size() ? pads_[p]
+-                          : pad          ? std::string("Controller")
+-                          : (p == 0 ? std::string("Keyboard") : "No controller");
++                          : pad          ? tr_lookup("Controller")
++                          : (p == 0 ? tr_lookup("Keyboard") : tr_lookup("No controller"));
+         std::string dev2 = !cfg_.keyboard ? ""
+-                           : p == 0 && pad ? "+ Keyboard"
+-                                           : (p == 0 ? "Connect a controller at any time" : "");
+-        s += "<div class=\"ccard-wrap\"><div class=\"ccard-label\">Player " + std::to_string(p + 1) +
++                           : p == 0 && pad ? tr_lookup("+ Keyboard")
++                                           : (p == 0 ? tr_lookup("Connect a controller at any time") : "");
++        s += "<div class=\"ccard-wrap\"><div class=\"ccard-label\">" + tr_lookup("Player") + " " + std::to_string(p + 1) +
+              "</div><div class=\"ccard" + std::string(usable ? "" : " empty") +
+              "\"><div class=\"cicon\">" + icon + "</div><div class=\"cdev\">" + esc(dev) +
+              "</div><div class=\"cdev2\">" + esc(dev2) + "</div></div>";
+@@ -723,13 +756,11 @@ std::string MenuUi::controls_cards() {
+         s += "<div id=\"" + id + "\" class=\"button secondary" +
+              std::string(usable ? " focusable" : " off") + "\" act=\"" +
+              (usable ? "ctl-edit:" + std::to_string(p) : std::string()) +
+-             "\">Edit Profile</div></div>";
++             "\">" + tr_lookup("Edit Profile") + "</div></div>";
+     }
+     s += cfg_.keyboard
+-             ? "</div><div class=\"cnote\">Controllers play in the order they are connected; the "
+-               "keyboard plays as player 1. Every controller uses the controller profile.</div>"
+-             : "</div><div class=\"cnote\">Controllers play in the order they are connected. "
+-               "Every controller uses the same profile.</div>";
++             ? "</div><div class=\"cnote\">" + tr_lookup("ctl_note_kb") + "</div>"
++             : "</div><div class=\"cnote\">" + tr_lookup("ctl_note_pad") + "</div>";
+     return s;
+ }
+ 
+@@ -738,14 +769,14 @@ std::string MenuUi::controls_mappings() {
+     std::string s = "<div class=\"chead\">";
+     if (capture_.active)
+         s += std::string("<div class=\"ctitle rec\">") +
+-             (kb ? "Press a key for " : "Press a button or move a stick for ") +
+-             ctl_label(capture_.control) + "</div><div class=\"pspacer\"></div><div "
+-             "class=\"chint\">" + (kb ? "Esc cancels" : cfg_.keyboard ? "Select or Esc cancels" : "The touch pad cancels") + "</div>";
++             (kb ? tr_lookup("Press a key for ") : tr_lookup("Press a button or move a stick for ")) +
++             tr_lookup(ctl_label(capture_.control)) + "</div><div class=\"pspacer\"></div><div "
++             "class=\"chint\">" + (kb ? tr_lookup("Esc cancels") : cfg_.keyboard ? tr_lookup("Select or Esc cancels") : "The touch pad cancels") + "</div>";
+     else
+-        s += std::string("<div class=\"ctitle\">Editing: ") +
+-             (kb ? "Keyboard profile" : "Controller profile") +
++        s += std::string("<div class=\"ctitle\">" + tr_lookup("Editing:") + " ") +
++             tr_lookup(kb ? "Keyboard profile" : "Controller profile") +
+              "</div><div class=\"pspacer\"></div><div id=\"c-back\" class=\"button "
+-             "focusable\" act=\"ctl-back\">Go back</div>";
++             "focusable\" act=\"ctl-back\">" + tr_lookup("Go back") + "</div>";
+     s += "</div>";
+     const auto& dev = editing();
+     const std::string how =
+@@ -753,24 +784,18 @@ std::string MenuUi::controls_mappings() {
+             ? "Press " + std::string(glyph(glyph_a())) +
+                   " on a box, then press the button or move the stick to use. The touch pad "
+                   "cancels."
+-        : kb ? "Click a box, or press Enter on it, then press the key to use. Escape cancels."
+-           : "Click a box, or press " + glyph(glyph_a()) +
+-                 " on it, then press the button or move the stick to use. Select or Escape "
+-                 "cancels.";
+-    const std::string who = kb ? "The keyboard plays as player 1, together with the first "
+-                                 "controller."
+-                               : "Every controller uses this profile; controller 1 plays as "
+-                                 "player 1, controller 2 as player 2.";
++        : kb ? tr_lookup(tr_lookup("ctl_how_kb"))
++           : tr_lookup("ctl_how_pad1") + glyph(glyph_a()) + tr_lookup("ctl_how_pad2");
++    const std::string who = kb ? tr_lookup("The keyboard plays as player 1, together with the first controller.")
++                               : tr_lookup("Every controller uses this profile; controller 1 plays as player 1, controller 2 as player 2.");
+     for (const auto& r : kCtlRows) {
+         const unsigned i = static_cast<unsigned>(r.c);
+         const std::string key = id_safe(dream::render::pad_control_key(r.c));
+         const std::string row = "b-" + key;
+-        descs_[row] = {r.label,
+-                       std::string("Two boxes: either binding works.<br/><br/>") + how +
+-                           "<br/><br/>" + glyph(utf8(kIconCross).c_str()) +
+-                           " clears both.<br/><br/>" + who,
++        descs_[row] = {tr_lookup(std::string(r.label)),
++                       tr_lookup("ctl_two_boxes") + "<br/><br/>" + how + "<br/><br/>" + glyph(utf8(kIconCross).c_str()) + " " + tr_lookup("ctl_clears_both") + "<br/><br/>" + who,
+                        true};
+-        s += "<div id=\"" + row + "\" class=\"crow\"><div class=\"clabel\">" + r.label +
++        s += "<div id=\"" + row + "\" class=\"crow\"><div class=\"clabel\">" + tr_lookup(std::string(r.label)) +
+              "</div><div class=\"cslots\">";
+         for (unsigned slot = 0; slot < dream::render::kBindingSlots; ++slot) {
+             const auto& b = dev.slot(r.c, slot);
+@@ -795,18 +820,14 @@ std::string MenuUi::controls_mappings() {
+ 
+ std::string MenuUi::controls_footer() {
+     const bool kb = ctl_device_ == 0;
+-    descs_["c-dev"] = {"Controller / keyboard",
+-                       "Which profile you are editing. Both are live at once: the keyboard "
+-                       "still works with a controller plugged in.",
++    descs_["c-dev"] = {tr_lookup("Controller / keyboard"),
++                       tr_lookup("ctl_dev_desc"),
+                        true};
+-    descs_["c-reset"] = {"Reset to defaults",
+-                         std::string("Puts every binding in the ") +
+-                             (kb ? "keyboard" : "controller") +
+-                             " profile back to the original layout.",
++    descs_["c-reset"] = {"" + tr_lookup("Reset to defaults") + "",
++                         tr_lookup(kb ? "ctl_reset_kb" : "ctl_reset_pad"),
+                          true};
+     const std::string reset =
+-        "<div id=\"c-reset\" class=\"button warning focusable\" act=\"ctl-reset\">Reset to "
+-        "defaults</div>";
++        "<div id=\"c-reset\" class=\"button warning focusable\" act=\"ctl-reset\">" + tr_lookup("Reset to defaults") + "</div>";
+     if (!cfg_.keyboard)
+         return reset;  // a console: the controller profile only
+     return std::string("<div id=\"c-dev\" class=\"ctoggle focusable\" act=\"ctl-device\"><span "
+@@ -1008,13 +1029,10 @@ std::string MenuUi::tab_mods() {
+                     "For pack authors: writes every new texture the game uses to<br/>" +
+                         esc(u8(config_dir_ / "texture_dump")),
+                     false);
+-    s += "<div class=\"psection\">Mods</div>";
++    s += "<div class=\"psection\">" + tr_lookup("Mods") + "</div>";
+     const auto mods_dir = config_dir_ / "mods";
+     const auto mods = list_mods(mods_dir, draft_.get("mods"));
+-    const std::string mod_help =
+-        "Each folder in the mods folder mirrors the disc's files and replaces the files it "
+-        "contains. Enabled mods load top to bottom; the first one providing a file wins. Use "
+-        "\xE2\x96\xB2 \xE2\x96\xBC to change the order.";
++    const std::string mod_help = tr_lookup("mod_help");
+     int order = 0;
+     for (std::size_t i = 0; i < mods.size(); ++i) {
+         const auto& m = mods[i];
+@@ -1028,7 +1046,7 @@ std::string MenuUi::tab_mods() {
+              std::string(draft_.pending("mods") ? " pending" : "") + "\" act=\"mod:" + esc(m.name) +
+              "\"><div class=\"plabel\">" + name_html("mods", m.name, false) +
+              "</div><div class=\"pvalue\"><span class=\"switch-label\">" +
+-             (m.enabled ? "On" : "Off") + "</span><span class=\"switch" + (m.enabled ? " on" : "") +
++             tr_lookup(m.enabled ? "On" : "Off") + "</span><span class=\"switch" + (m.enabled ? " on" : "") +
+              "\"><span class=\"knob\"></span></span></div></div>";
+         s += "<div id=\"mu-" + id + "\" class=\"mini" + std::string(can_up ? " focusable" : " off") +
+              "\" act=\"" + (can_up ? "modup:" + esc(m.name) : std::string()) +
+@@ -1038,7 +1056,7 @@ std::string MenuUi::tab_mods() {
+              (can_down ? "moddown:" + esc(m.name) : std::string()) + "\">\xE2\x96\xBC</div></div>";
+     }
+     if (mods.empty())
+-        s += "<div class=\"pnote\">No mods installed.</div>";
++        s += "<div class=\"pnote\">" + tr_lookup("No mods installed.") + "</div>";
+     if (cfg_.can_open_external)
+         s += row_button("r-openmods", "open-mods", "Open mods folder", "Open",
+                     "Opens " + esc(u8(mods_dir)) + " (created if missing). Add each mod as a "
+@@ -1052,10 +1070,10 @@ std::string MenuUi::page_panel() {
+     for (int i = 0; i < kTabCount; ++i)
+         s += std::string("<div id=\"tab-") + kTabs[i][0] + "\" class=\"ptab focusable" +
+              (i == tab_ ? " active" : "") + "\" act=\"tab:" + std::to_string(i) + "\">" +
+-             kTabs[i][1] + "</div>";
++             tr_lookup(kTabs[i][1]) + "</div>";
+     s += "<div class=\"pspacer\"></div>";
+     if (cfg_.can_quit)
+-        s += "<div id=\"p-quit\" class=\"pquit focusable\" act=\"ask-quit\">Quit Game</div>";
++        s += "<div id=\"p-quit\" class=\"pquit focusable\" act=\"ask-quit\">" + tr_lookup("Quit Game") + "</div>";
+     s += "<div id=\"p-close\" class=\"pclose focusable\" "
+          "act=\"close\">\xC3\x97</div></div><div id=\"pbody\"" +
+          std::string(tab_ == 1 && ctl_view_ == 0 ? " class=\"wide\"" : "") +
+@@ -1070,11 +1088,11 @@ std::string MenuUi::page_panel() {
+     s += "</div><div id=\"pdesc\"><div id=\"pdesc-title\"></div><div id=\"pdesc-text\"></div><div "
+          "id=\"pdesc-note\"></div></div></div><div id=\"pfoot\"><div id=\"phints\">";
+     if (has_pad())
+-        s += glyph(glyph_a()) + hint("Select") + glyph(glyph_b()) + hint("Close") +
+-             glyph(glyph_lb()) + glyph(glyph_rb()) + hint("Tabs");
++        s += glyph(glyph_a()) + hint(tr_lookup("Select")) + glyph(glyph_b()) + hint(tr_lookup("Close")) +
++             glyph(glyph_lb()) + glyph(glyph_rb()) + hint(tr_lookup("Tabs"));
+     else
+-        s += glyph(kGlyphEnter) + hint("Select") + glyph(kGlyphEsc) + hint("Close") +
+-             keycap("Q") + keycap("E") + hint("Tabs");
++        s += glyph(kGlyphEnter) + hint(tr_lookup("Select")) + glyph(kGlyphEsc) + hint(tr_lookup("Close")) +
++             keycap("Q") + keycap("E") + hint(tr_lookup("Tabs"));
+     s += "</div>";
+     if (tab_ == 1 && ctl_view_ == 1)
+         s += controls_footer();
+@@ -1082,11 +1100,11 @@ std::string MenuUi::page_panel() {
+     if (!toast_.empty())
+         s += esc(toast_);
+     else if (draft_.any_pending())
+-        s += "\xE2\x97\x8F  Not applied yet";
++        s += "\xE2\x97\x8F  " + tr_lookup("Not applied yet") + "";
+     s += "</div>";
+     if (tab_has_settings(tab_))
+         s += std::string("<div id=\"btn-apply\" class=\"button focusable") +
+-             (draft_.any_pending() ? " attention" : "") + "\" act=\"apply\">Apply</div>";
++             (draft_.any_pending() ? " attention" : "") + "\" act=\"apply\">" + tr_lookup("Apply") + "</div>";
+     s += "</div></div>";
+     return s;
+ }
+@@ -1100,8 +1118,8 @@ std::string MenuUi::page_modal() const {
+                                           : "<div class=\"hashes\">" + modal_.extra + "</div>") +
+                     "<div class=\"mbuttons\">";
+     if (modal_.confirm_quit)
+-        s += "<div id=\"modal-quit\" class=\"button danger focusable\" act=\"exit\">Quit</div>"
+-             "<div id=\"modal-cancel\" class=\"button focusable\" act=\"modal-ok\">Cancel</div>";
++        s += "<div id=\"modal-quit\" class=\"button danger focusable\" act=\"exit\">" + tr_lookup("Quit") + "</div>"
++             "<div id=\"modal-cancel\" class=\"button focusable\" act=\"modal-ok\">" + tr_lookup("Cancel") + "</div>";
+     else
+         s += "<div id=\"modal-ok\" class=\"button focusable\" act=\"modal-ok\">OK</div>";
+     return s + "</div></div>";
+@@ -1123,7 +1141,7 @@ void MenuUi::describe(Rml::Element* e) {
+             t->SetInnerRML(it->second.text);
+         if (auto* t = doc_->GetElementById("pdesc-note"))
+             t->SetInnerRML(mode_ == Mode::InGame && !it->second.live
+-                               ? "Takes effect the next time the game starts."
++                               ? tr_lookup("Takes effect the next time the game starts.")
+                                : "");
+         redraw_ = true;
+         return;
+@@ -1263,7 +1281,7 @@ void MenuUi::open_folder(const std::filesystem::path& dir) {
+ void MenuUi::apply() {
+     if (!draft_.any_pending())
+         return;
+-    toast_ = draft_.apply() ? "Applied" : "Could not write the settings file";
++    toast_ = draft_.apply() ? tr_lookup("Applied") : tr_lookup("Could not write the settings file");
+     toast_until_ = SDL_GetTicks() + 2500;
+     std::printf("launcher: apply: %s (%s)\n", toast_.c_str(), u8(cfg_.settings->file()).c_str());
+     if (host_.applied)
+@@ -1320,11 +1338,8 @@ void MenuUi::run_act(const std::string& act, Rml::Event* ev) {
+         back();
+     } else if (kind == "ask-quit" && cfg_.can_quit) {
+         modal_open_ = true;
+-        modal_ = {"Quit " + title() + "?",
+-                  mode_ == Mode::InGame
+-                      ? "The game closes. Your memory card is saved as you play; settings you have "
+-                        "not applied are not kept."
+-                      : "The launcher closes.",
++        modal_ = {tr_lookup("Quit_title"),
++                  mode_ == Mode::InGame ? tr_lookup("Quit_text") : "The launcher closes.",
+                   "", true};
+         want_focus_ = "modal-cancel";
+         dirty_ = true;
