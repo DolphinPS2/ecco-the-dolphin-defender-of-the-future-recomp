@@ -3,8 +3,8 @@ import os, sys, time, shutil, subprocess, urllib.request, zipfile, tempfile, thr
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-ENGINE_ZIP_URL = "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_Engine_Linux64.zip"
-LAUNCHER_ZIP_URL = "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.0-dc-pc-launcher/Ecco_the_Dolphin_DC_PC_Launcher_Win_Linux.zip"
+ENGINE_ZIP_URL = "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.4/Ecco_the_Dolphin_Engine_Linux64.zip"
+LAUNCHER_ZIP_URL = "https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.4/Ecco_the_Dolphin_DC_PC_Launcher_Win_Linux.zip"
 
 class EccoLinuxInstaller(tk.Tk):
     def __init__(self):

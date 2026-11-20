@@ -33,6 +33,7 @@ def run_engine(choice):
     os.chdir(ENGINE_DIR)
     env = os.environ.copy()
     env["APPDATA"] = prof_root
+    env["DREAMCOMP_LANG"] = "ru" if choice == 1 else "en"
     args = [BIN_PATH, "--config", TOML_PATH, "--disc", DISC_PATH, "--settings", settings_path, "--vmu", vmu_path, "--window", "--fullscreen", "--widescreen", "--scale", "3", "--interpolate-auto", "--soft-clip", "--present-path", "dxgi"]
     if choice == 1 and os.path.isdir(mod_dir):
         args += ["--mod", mod_dir]

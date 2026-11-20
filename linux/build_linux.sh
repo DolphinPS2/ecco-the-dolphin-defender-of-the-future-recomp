@@ -29,15 +29,21 @@ PORT_DST="ports/ecco-the-dolphin-defender-of-the-future-recomp"
 rm -rf "$PORT_DST"
 cp -a "$PORT_SRC" "$PORT_DST"
 
+git -C "$DC_DIR" apply "$PORT_DST/patches/dreamcomp_ru_menu.patch" 2>/dev/null || true
 .venv/bin/python tools/dc.py deps
 .venv/bin/python tools/dc.py setup "$PORT_DST" --disc "$DISC_PATH"
 rm -rf "$PORT_DST/build"
-cmake -S "$PORT_DST" -B "$PORT_DST/build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DDREAMCOMP_DIR="$DC_DIR" -DDREAMCOMP_FRONTEND=OFF
+cmake -S "$PORT_DST" -B "$PORT_DST/build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DDREAMCOMP_DIR="$DC_DIR" -DDREAMCOMP_FRONTEND=ON
 .venv/bin/python tools/dc.py build "$PORT_DST"
 
 OUT_DIR="$WORK_DIR/Ecco_the_Dolphin_PC"
 mkdir -p "$OUT_DIR/engine" "$OUT_DIR/disc" "$OUT_DIR/profiles/europe/dreamcomp/ecco" "$OUT_DIR/profiles/paradox_rus/dreamcomp/ecco"
 cp -f "$PORT_DST/build/game/ecco-the-dolphin-defender-of-the-future-recomp" "$OUT_DIR/engine/"
+mkdir -p "$OUT_DIR/engine/frontend"
+cp -f "$PORT_DST/frontend/lang_ru.ini" "$OUT_DIR/engine/frontend/lang_ru.ini"
+if [[ -d "$PORT_DST/build/game/frontend" ]]; then
+    cp -rf "$PORT_DST/build/game/frontend/." "$OUT_DIR/engine/frontend/"
+fi
 cp -f "$PORT_DST/game/ecco.toml" "$PORT_DST/game/hud_overrides.ini" "$OUT_DIR/engine/" 2>/dev/null || true
 if [[ -d "$PORT_DST/game/extracted" ]]; then
     cp -a "$PORT_DST/game/extracted" "$OUT_DIR/engine/extracted"
