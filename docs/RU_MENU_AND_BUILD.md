@@ -21,3 +21,9 @@
 ## 4. Структура локальных резервных копий (`X:\ECCOEXE\`)
 - `X:\ECCOEXE\1.3\` — эталонная сборка v1.3 с английским меню.
 - `X:\ECCOEXE\1.4\` — релиз v1.4 с двуязычным меню, исходниками и заметками.
+
+## 5. Команды быстрой пересборки на Linux (Arch / EndeavourOS / SteamOS)
+- **Сборка движка с русским/английским меню (`ninja`, ~5 сек при наличии кэша):**
+  `cmake -S "$PORT" -B "$PORT/build" -G Ninja -DCMAKE_BUILD_TYPE=Release -DDREAMCOMP_DIR="$DC" -DDREAMCOMP_FRONTEND=ON && ninja -C "$PORT/build"`
+- **Упаковка `Ecco_the_Dolphin_Engine_Linux64.zip` и `Ecco_the_Dolphin_Linux_Setup.run`:**
+  Выполняется из `build/game/ecco-the-dolphin-defender-of-the-future-recomp` с добавлением `engine/frontend/lang_ru.ini`, `engine/frontend/fonts/` и скриптов `linux/ecco_linux_installer.py`, `windows/launcher.py`, `tools/extract_paradox_mod.py`.
