@@ -170,3 +170,21 @@ GPL-2.0.
 **Русский:** Экко Дельфин: Защитник Будущего на ПК (Windows / Linux / Steam Deck) — нативный порт версии SEGA Dreamcast (не эмулятор). Включает европейскую версию (Europe MK-5103350) и русскую версию с полной озвучкой и переводом Paradox (Paradox RUS), поддержку широкоформатных экранов 16:9 и 21:9, высокое разрешение и 60+ FPS.
 
 **English:** Ecco the Dolphin: Defender of the Future Native PC Port for Windows 10/11, Linux, and Steam Deck (SEGA Dreamcast static recompilation via dreamcomp). Supports Europe Original edition (MK-5103350) and Paradox Russian edition (Paradox RUS) with graphical launcher, widescreen 21:9, and high refresh rate.
+
+
+- **Launching `.run` / `.sh` & Desktop Shortcuts in KDE Plasma 6 (Dolphin):**
+  1. Right-click `Ecco_the_Dolphin_Linux_Setup.run` (or `Ecco_the_Dolphin.sh`) → **Properties** → **Permissions** → check **Is executable**.
+  2. Open **Dolphin** → **Configure Dolphin** (`Ctrl+Shift+,`) → **Confirmations** → set **When opening an executable file** to **Always execute** (or **Ask what to do**).
+  3. On first click of the Desktop shortcut, click **Trust and Launch** (or launch directly from **Application Menu → Games → Ecco the Dolphin**).
+
+- **Запуск `.run` / `.sh` и ярлыка в KDE Plasma 6 (Dolphin) без терминала:**
+  1. Правый клик по `Ecco_the_Dolphin_Linux_Setup.run` (или `Ecco_the_Dolphin.sh`) → **Свойства** → **Права** → поставьте галочку **«Является выполняемым»**.
+  2. Откройте **Dolphin** → **Настроить Dolphin** (`Ctrl+Shift+,`) → **Подтверждения** → в пункте **«При открытии исполняемого файла»** выберите **«Всегда запускать»** (или **«Спрашивать, что делать»**).
+  3. При первом клике по ярлыку на Рабочем столе нажмите **«Доверять и запустить»** (или запускайте игру напрямую из **Меню приложений → Игры → Ecco the Dolphin**).
+
+### Verified Test System (Linux x64) / Проверенная тестовая система (Linux x64)
+- **OS:** EndeavourOS (64-bit, Kernel `7.3.4-arch1-2`)
+- **Desktop Environment:** KDE Plasma `6.8.3` / KDE Frameworks `6.32.0` / Qt `6.12.0` (`Wayland`)
+- **CPU:** AMD Ryzen 9 5900X (24 threads)
+- **RAM:** 32 GiB
+- **GPU:** NVIDIA GeForce RTX 2070 SUPER
