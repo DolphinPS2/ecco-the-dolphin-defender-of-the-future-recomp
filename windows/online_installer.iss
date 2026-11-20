@@ -15,6 +15,8 @@ DirExistsWarning=auto
 WizardSizePercent=115
 PrivilegesRequired=lowest
 PrivilegesRequiredOverridesAllowed=dialog
+UsePreviousPrivileges=no
+UsePreviousAppDir=no
 Compression=lzma2
 SolidCompression=yes
 WizardStyle=modern
@@ -171,9 +173,9 @@ begin
     if (not UseLocalEngine) or NeedVcRedist then begin
       DownloadPage.Clear;
       if not UseLocalEngine then
-        DownloadPage.Add('https://github.com', 'engine.zip', '');
+        DownloadPage.Add('https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.3/Ecco_the_Dolphin_Engine_Win64.zip', 'engine.zip', '');
       if NeedVcRedist then
-        DownloadPage.Add('https://aka.ms', 'vc_redist.x64.exe', '');
+        DownloadPage.Add('https://aka.ms/vs/17/release/vc_redist.x64.exe', 'vc_redist.x64.exe', '');
       DownloadPage.Show;
       try
         try
@@ -205,8 +207,8 @@ begin
       EngineZip := LocalEnginePath
     else
       EngineZip := ExpandConstant('{tmp}\engine.zip');
-    Cmd := '/c powershell -NoProfile -Command "Expand-Archive -Path ''' + EngineZip + ''' -DestinationPath ''' + ExpandConstant('{app}') + ''' -Force"';
-    Exec(ExpandConstant('{cmd}'), Cmd, '', SW_HIDE, ewWaitUntilTerminated, ResCode);
+    Cmd := '-xf "' + EngineZip + '" -C "' + ExpandConstant('{app}') + '"';
+    Exec('tar.exe', Cmd, '', SW_HIDE, ewWaitUntilTerminated, ResCode);
     EuSrc := DiscPage.Values[0];
     EuExt := ExtractFileExt(EuSrc);
     ForceDirectories(ExpandConstant('{app}\disc'));
@@ -217,5 +219,15 @@ begin
       Cmd := '/c set "PATH=' + ExpandConstant('{app}\tools') + ';%PATH%" && "' + ExpandConstant('{app}\tools\extract_paradox_mod.exe') + '" "' + RuSrc + '" "' + ExpandConstant('{app}\profiles\paradox_rus\dreamcomp\ecco\mods\rus_paradox') + '"';
       Exec(ExpandConstant('{cmd}'), Cmd, '', SW_HIDE, ewWaitUntilTerminated, ResCode);
     end;
+  end;
+end;
+
+procedure CancelButtonClick(CurPageID: Integer; var Cancel, Confirm: Boolean);
+begin
+  if CurPageID = wpInstalling then begin
+    DeleteFile(ExpandConstant('{autodesktop}\Ecco the Dolphin.lnk'));
+    DeleteFile(ExpandConstant('{userappdata}\Microsoft\Internet Explorer\Quick Launch\User Pinned\TaskBar\Ecco the Dolphin.lnk'));
+    DelTree(ExpandConstant('{group}'), True, True, True);
+    DelTree(ExpandConstant('{app}'), True, True, True);
   end;
 end;
