@@ -5,10 +5,10 @@ AppVersion=1.5
 AppPublisher=DolphinPS2 / cherryduck
 DefaultDirName={autopf}\Ecco the Dolphin
 DefaultGroupName=Ecco the Dolphin
-OutputDir=C:\Users\dolph\Downloads\Engine
+OutputDir=X:\ECCOEXE\GITHUB_RELEASE_v15\release_assets
 OutputBaseFilename=Ecco_the_Dolphin_Online_Setup_v15
-SetupIconFile=C:\Users\dolph\Downloads\Engine\setup_build\ecco.ico
-WizardSmallImageFile=C:\Users\dolph\Downloads\Engine\setup_build\wizard_small.bmp
+SetupIconFile=X:\ECCOEXE\1.4\setup_build\ecco.ico
+WizardSmallImageFile=X:\ECCOEXE\1.4\setup_build\wizard_small.bmp
 UninstallDisplayIcon={app}\ecco.ico
 ExtraDiskSpaceRequired=209715200
 DirExistsWarning=auto
@@ -31,10 +31,10 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Name: "pin_taskbar"; Description: "Закрепить ярлык на Панели задач"; GroupDescription: "{cm:AdditionalIcons}"
 
 [Files]
-Source: "C:\Users\dolph\Downloads\Engine\setup_build\ecco.ico"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\dolph\Downloads\Engine\setup_build\sun_fall.mp3"; DestDir: "{tmp}"; Flags: dontcopy
-Source: "C:\Users\dolph\Downloads\Engine\setup_build\sonic.bmp"; DestDir: "{tmp}"; Flags: dontcopy
-Source: "C:\Users\dolph\Downloads\Engine\setup_build\textecco.bmp"; DestDir: "{tmp}"; Flags: dontcopy
+Source: "X:\ECCOEXE\1.4\setup_build\ecco.ico"; DestDir: "{app}"; Flags: ignoreversion
+Source: "X:\ECCOEXE\1.4\setup_build\sun_fall.mp3"; DestDir: "{tmp}"; Flags: dontcopy
+Source: "X:\ECCOEXE\1.4\setup_build\sonic.bmp"; DestDir: "{tmp}"; Flags: dontcopy
+Source: "X:\ECCOEXE\1.4\setup_build\textecco.bmp"; DestDir: "{tmp}"; Flags: dontcopy
 
 [Icons]
 Name: "{group}\Ecco the Dolphin"; Filename: "{app}\Ecco_the_Dolphin.exe"; IconFilename: "{app}\ecco.ico"; AppUserModelID: "DolphinPS2.EccoDefender.Launcher"
@@ -231,4 +231,5 @@ begin
     DelTree(ExpandConstant('{app}'), True, True, True);
   end;
 end;
+
 
