@@ -19,17 +19,6 @@ FFPLAY_BIN = os.path.join(BASE_DIR, "runtime", "ffplay.exe") if os.path.exists(o
 TOML_PATH = os.path.join(ENGINE_DIR, "ecco.toml")
 W, H, UI_FPS, VID_FPS = 2560, 1440, 60, 30
 
-def set_sys_cursor_visible(show):
-    try:
-        u32 = ctypes.windll.user32
-        if show:
-            u32.SystemParametersInfoW(0x0057, 0, None, 0)
-        else:
-            u32.CreateCursor.restype = ctypes.c_void_p
-            blank = u32.CreateCursor(None, 0, 0, 1, 1, b"\xFF", b"\x00")
-            u32.SetSystemCursor(ctypes.c_void_p(blank), 32512)
-    except Exception:
-        pass
 
 def setup_portable_env(choice_name):
     return os.path.join(BASE_DIR, "profiles", choice_name)
@@ -65,7 +54,7 @@ def load_mascot_tex(renderer):
     return None, 0, 0
 
 def run_engine(choice):
-    set_sys_cursor_visible(True)
+    pass
     prof_name = "europe" if choice == 0 else "paradox_rus"
     prof_root = setup_portable_env(prof_name)
     cfg_dir = os.path.join(prof_root, "dreamcomp", "ecco")
@@ -135,18 +124,9 @@ def main():
     for j in joys: j.init()
     win = Window("Ecco the Dolphin: Defender of the Future", size=(W, H), fullscreen_desktop=True, borderless=True)
     win.focus()
-    u32 = ctypes.windll.user32
-    u32.FindWindowW.restype = ctypes.c_void_p; u32.GetForegroundWindow.restype = ctypes.c_void_p
-    hwnd = u32.FindWindowW(None, "Ecco the Dolphin: Defender of the Future")
-    fg = u32.GetForegroundWindow()
-    t1 = u32.GetWindowThreadProcessId(fg, None); t2 = ctypes.windll.kernel32.GetCurrentThreadId()
-    u32.AttachThreadInput(t1, t2, True)
-    u32.SetWindowPos(ctypes.c_void_p(hwnd), ctypes.c_void_p(-1), 0, 0, 0, 0, 3)
-    u32.SetWindowPos(ctypes.c_void_p(hwnd), ctypes.c_void_p(-2), 0, 0, 0, 0, 3)
-    u32.SetForegroundWindow(ctypes.c_void_p(hwnd)); u32.AttachThreadInput(t1, t2, False)
-    u32.SetFocus(ctypes.c_void_p(hwnd))
-    u32.SetCursorPos(1280, 720); u32.mouse_event(2, 0, 0, 0, 0); u32.mouse_event(4, 0, 0, 0, 0)
-    set_sys_cursor_visible(False)
+    pygame.event.pump(); win.focus()
+    
+    pass
 
     renderer = Renderer(win, vsync=True); renderer.logical_size = (W, H); clock = pygame.time.Clock()
     ui_font = pygame.font.SysFont("Segoe UI", 28, bold=True)
@@ -228,13 +208,13 @@ def main():
     def trigger_patch_dialog():
         if sel != 1 or patch_state["active"] or patch_state.get("dialog_open"): return
         patch_state["dialog_open"] = True
-        set_sys_cursor_visible(True)
+        pass
         def worker():
             try:
                 p = open_file_native()
                 if not p:
                     patch_state["dialog_open"] = False
-                    set_sys_cursor_visible(False)
+                    pass
                     return
                 patch_state.update({"active": True, "done": False, "prog": 0.02, "vis_prog": 0.0, "text": "ПЕРЕНОС ПЕРЕВОДА И ОРИГИНАЛЬНОЙ МУЗЫКИ: 0%", "color": (255, 240, 150)})
                 def on_prog(cur, tot, fn):
@@ -247,7 +227,7 @@ def main():
                 patch_state.update({"active": False, "done": True, "prog": 0.0, "text": f"ОШИБКА: {str(ex)[:45]}", "color": (255, 145, 145)})
             finally:
                 patch_state["dialog_open"] = False
-                set_sys_cursor_visible(False)
+                pass
         threading.Thread(target=worker, daemon=True).start()
     def load_snd(n, v):
         p = os.path.join(MEDIA_DIR, n)
@@ -287,12 +267,12 @@ def main():
                     elif e.key == pygame.K_F2: snd_sel and snd_sel.play(); trigger_patch_dialog()
                     elif e.key in (pygame.K_RETURN, pygame.K_SPACE) and not patch_state["active"]: launching = True; snd_ok and snd_ok.play(); pygame.mixer.fadeout(700)
                     elif e.key == pygame.K_ESCAPE: snd_back and snd_back.play(); time.sleep(0.25); running = False
-                elif e.type == pygame.MOUSEMOTION and t_anim > 0.4:
-                    if not mouse_moved: set_sys_cursor_visible(True)
+                elif e.type == pygame.MOUSEMOTION:
+                    if not mouse_moved: pass
                     mouse_moved = True
                     if r_eu.collidepoint(e.pos) and sel != 0: sel = 0; snd_sel and snd_sel.play()
                     elif r_ru.collidepoint(e.pos) and sel != 1: sel = 1; snd_sel and snd_sel.play()
-                elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
+                elif e.type == pygame.MOUSEBUTTONDOWN and e.button == 1 and t_anim > 0.5:
                     if net_rect.collidepoint(e.pos): snd_sel and snd_sel.play(); webbrowser.open("https://dreampipe.net")
                     elif badge_rect.collidepoint(e.pos): snd_sel and snd_sel.play(); trigger_patch_dialog()
                     elif r_eu.collidepoint(e.pos) and not patch_state["active"]: sel, launching = 0, True; snd_ok and snd_ok.play(); pygame.mixer.fadeout(700)
@@ -302,8 +282,8 @@ def main():
                 if not j.get_init(): continue
                 nb = j.get_numbuttons()
                 if any(j.get_button(b) for b in range(nb)) and mouse_moved:
-                    mouse_moved = False; set_sys_cursor_visible(False)
-                if any(nb > b and j.get_button(b) for b in (0, 7, 9, 11)) and not patch_state["active"]: launching = True; snd_ok and snd_ok.play(); pygame.mixer.fadeout(700); break
+                    mouse_moved = False; pass
+                if t_anim > 0.5 and any(nb > b and j.get_button(b) for b in (0, 7, 9, 11)) and not patch_state["active"]: launching = True; snd_ok and snd_ok.play(); pygame.mixer.fadeout(700); break
                 if (nb > 3 and j.get_button(3)) and joy_cd <= 0: joy_cd = 0.4; snd_sel and snd_sel.play(); trigger_patch_dialog(); break
                 if (nb > 1 and j.get_button(1)): snd_back and snd_back.play(); time.sleep(0.25); running = False; break
                 if joy_cd <= 0:
@@ -339,14 +319,17 @@ def main():
             l_timer += dt; fade = min(255.0, fade + dt * 380.0)
             if l_timer >= 0.75:
                 for s in streams: s.close()
-                set_sys_cursor_visible(True)
+                pass
                 pygame.quit(); run_engine(sel)
         if fade > 0: fade_tex.alpha = int(fade); renderer.blit(fade_tex, dest=pygame.Rect(0, 0, W, H))
         renderer.present()
     for s in streams: s.close()
-    set_sys_cursor_visible(True)
+    pass
     pygame.quit()
 
 if __name__ == "__main__": main()
+
+
+
 
 
