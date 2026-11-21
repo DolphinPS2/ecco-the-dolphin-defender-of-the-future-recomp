@@ -125,7 +125,7 @@ class FancyEccoLinuxInstaller(tk.Tk):
             with zipfile.ZipFile(tmp_e, "r") as zf: zf.extractall(out_dir)
             os.chmod(os.path.join(out_dir, "engine", "ecco-the-dolphin-defender-of-the-future-recomp"), 0o755)
             os.makedirs(os.path.join(out_dir, "disc"), exist_ok=True)
-            shutil.copy2(eu, os.path.join(out_dir, "disc", "ecco_eu" + os.path.splitext(eu)))
+            shutil.copy2(eu, os.path.join(out_dir, "disc", "ecco_eu" + os.path.splitext(eu)[1]))
             if ru and os.path.isfile(ru):
                 self._set_progress(85, "Перенос русской озвучки Paradox RUS и сохранение музыки...")
                 subprocess.run([sys.executable, os.path.join(self.repo_root, "tools", "extract_paradox_mod.py"), ru, os.path.join(out_dir, "profiles", "paradox_rus", "dreamcomp", "ecco", "mods", "rus_paradox")], check=True)
