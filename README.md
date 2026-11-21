@@ -46,24 +46,38 @@ recompiled code against the engine's SH-4 interpreter.
 - Saves to a per-user virtual memory card; rumble; keyboard and gamepad, rebindable in game
 - Texture dumping and replacement packs, file mods (dreamcomp `docs/TEXTURE-PACKS.md`, `docs/MODS.md`)
 
-## Windows & Linux Installers + Dual-Version DC PC Launcher (Recommended)
+## Windows & Linux Installers + Dual-Version 2K DC PC Launcher (`v1.5-beta`)
 
-Download the graphical installer for your platform to set up this native Dreamcast-to-PC static recompilation port with the interactive **DC PC Graphical Launcher** and two isolated game editions:
+Download the graphical installer for your platform to set up this native Dreamcast-to-PC static recompilation port with the interactive **2K DC PC Graphical Launcher**, animated 3D dolphin, and two completely isolated game editions:
 
-- **Windows Installer:** **[Ecco_the_Dolphin_Online_Setup_v14.exe](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.4/Ecco_the_Dolphin_Online_Setup_v14.exe)** (with desktop, Start Menu, and taskbar shortcuts).
-- **Linux / Steam Deck Installer:** **[Ecco_the_Dolphin_Linux_Setup.run](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.4/Ecco_the_Dolphin_Linux_Setup.run)** (fast prebuilt engine setup with `.desktop` application shortcuts).
-- **Europe Original (`MK-5103350`, En / Fr / De / Es)** - authentic European Dreamcast release with widescreen (up to 21:9), up to 8x internal resolution, and high refresh rate interpolation.
-- **Paradox Russian Edition (`Paradox RUS` - Full Russian Text & Voiceover)** - automatically extracted from your Paradox `.cdi` / `.chd` / `.gdi` disc image during setup, with isolated settings and virtual memory card (`VMU`) saves.
+- **Windows Installer (`v1.5-beta`):** **[Ecco_the_Dolphin_Online_Setup_v15.exe](https://github.com)** (with 2K intro video, background music, desktop/Start/taskbar shortcuts, and automatic VC++ / disc setup).
+- **Linux / Steam Deck Installer (`v1.5-beta`):** **[Ecco_the_Dolphin_Linux_Setup_v15.run](https://github.com)** (fast prebuilt Vulkan engine setup with `.desktop` application shortcuts).
+- **What's New in v1.5:**
+  - **Full Original Soundtrack in Paradox Russian Edition:** extracts all 48 localized `.GDE` level files (full Russian voiceover & fonts) while stripping broken pirate `MUSIC_*.AFS` archives — restoring the complete original Dreamcast CD soundtrack!
+  - **In-Launcher Translation & Music Transfer (`[F2 / Y]`):** underwater wave progress bar with bubbles, native `.cdi` / `.chd` / `.gdi` disc parser, and clean overwrite on re-import.
+  - **Animated `SEGANET • DREAMPIPE.NET` Underwater Beacon:** subtle glowing link in the ocean depths opening the revived Dreamcast portal.
+  - **Full Gamepad & Dual-Profile Support:** instant launch via **Start** or **A**, plus isolated `settings.ini` and `VMU` memory cards for **Europe Original** and **Paradox RUS**.
+  - *Next up (`v1.6` — see [ROADMAP_v1.6.md](ROADMAP_v1.6.md)):* Built-in **VMU Save Manager (`[F3 / X]`)** with `.VMI`/`.VMS` import/export & cross-profile save cloning, plus an interactive HD VMU screen overlay.
 
-### Установка на Windows и Linux (на русском языке)
+---
 
-- **Windows:** Скачайте и запустите **[Ecco_the_Dolphin_Online_Setup_v14.exe](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.4/Ecco_the_Dolphin_Online_Setup_v14.exe)**, выберите папку установки, ярлыки (Рабочий стол, меню «Пуск», Панель задач) и укажите ваши образы дисков (**Europe** `.chd`/`.cue`/`.gdi` и опционально **Paradox RUS** `.cdi`/`.chd`/`.gdi`).
-- **Linux / Steam Deck:** Скачайте **[Ecco_the_Dolphin_Linux_Setup.run](https://github.com/DolphinPS2/ecco-the-dolphin-defender-of-the-future-recomp/releases/download/v1.4/Ecco_the_Dolphin_Linux_Setup.run)** в папку «Загрузки», откройте там терминал и выполните:
+### Установка и новинки версии v1.5 (на русском языке)
+
+Погрузитесь в нативный ПК-порт **Ecco the Dolphin: Defender of the Future** с фирменным **2K-лаунчером в стиле Dreamcast**, 3D-дельфином и двумя независимыми версиями игры в одном окне:
+
+- **Установщик для Windows (`v1.5-beta`):** Скачайте и запустите **[Ecco_the_Dolphin_Online_Setup_v15.exe](https://github.com)** — мастер установки с фоновой музыкой сам скачает движок, настроит ярлыки (Рабочий стол, меню «Пуск», Панель задач) и подготовит ваши образы дисков (**Europe** `.chd`/`.cue`/`.gdi` и опционально **Paradox RUS** `.cdi`/`.chd`/`.gdi`).
+- **Установщик для Linux / Steam Deck (`v1.5-beta`):** Скачайте **[Ecco_the_Dolphin_Linux_Setup_v15.run](https://github.com)** в папку «Загрузки», откройте терминал и выполните:
 ```bash
-chmod +x Ecco_the_Dolphin_Linux_Setup.run
-./Ecco_the_Dolphin_Linux_Setup.run
+chmod +x Ecco_the_Dolphin_Linux_Setup_v15.run
+./Ecco_the_Dolphin_Linux_Setup_v15.run
 ```
-Откроется графический мастер установки с иконкой дельфина, выбором папки, выбором обоих образов дисков и созданием ярлыков `.desktop` в меню приложений.
+
+#### Что нового в обновлении v1.5:
+- **Полная оригинальная музыка в русской версии (`Paradox RUS`):** при переносе перевода с диска Paradox извлекаются только **48 файлов уровней (`.GDE`)** с русской озвучкой и шрифтами, а обрезанные пиратские аудиоархивы отбрасываются — теперь в русской версии играет **весь оригинальный саундтрек**!
+- **Перенос перевода прямо из лаунчера (`[F2 / Y]`):** при выборе «Русской Версии» внизу появляется живая подводная волна с пузырьками прогресса; поддерживаются образы `.cdi`, `.chd` и `.gdi` без лишних программ.
+- **Пасхалка `SEGANET • DREAMPIPE.NET`:** едва заметный колышущийся маячок на глубине между кнопками, открывающий возрождённый онлайн-портал эпохи Dreamcast.
+- **Независимые профили и управление с геймпада:** отдельные настройки и карты памяти `VMU` для **Original Version** и **Русской Версии**, фирменная 2K-заставка и старт игры по кнопке **Start** или **A**.
+- **Документация и планы (`v1.6`):** подробный паспорт проекта доступен в **[AI_CONTEXT_README.txt](AI_CONTEXT_README.txt)** и **[ROADMAP_v1.6.md](ROADMAP_v1.6.md)** (в следующей версии запланирован встроенный **Менеджер сохранений VMU** с поддержкой `.VMI`/`.VMS` и переносом сохранений между версиями).
 
 ## One-Click Automated Build (Windows & Linux)
 
